@@ -27,13 +27,7 @@ public class TeleOpMode extends OpMode {
         robotControllers = new RobotController[]{
             new RecorderController(this),
             new DriveController(this),
-            new LiftController(this),
-            new ClawController(this),
-            new SlideController(this),
-            new TiltController(this),
-            new StickController(this),
             new LightsController(this),
-            new AssistController(this)
         };
 
         while (isActive()) {
