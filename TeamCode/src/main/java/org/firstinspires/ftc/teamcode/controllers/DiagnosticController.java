@@ -7,9 +7,9 @@ public class DiagnosticController extends RobotController {
 
     @Override
     public void execute() {
-        if (gamepad1.back && gamepad1.start && gamepad1.atRest()) {
-
-
+        if ((gamepad1.back && gamepad1.start && gamepad1.atRest()) || (gamepad2.back && gamepad2.start && gamepad2.atRest())) {
+            robot.diagnosticMode = true;
         }
     }
+
 }

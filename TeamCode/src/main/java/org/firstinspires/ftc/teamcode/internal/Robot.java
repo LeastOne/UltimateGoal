@@ -47,6 +47,8 @@ public class Robot {
     private static RevBlinkinLedDriver.BlinkinPattern PICKUP_COLOR = GREEN;
     private static RevBlinkinLedDriver.BlinkinPattern TARGET_COLOR = YELLOW;
 
+    public boolean diagnosticMode;
+
     private OpMode opMode;
 
     private BNO055IMU imu;
