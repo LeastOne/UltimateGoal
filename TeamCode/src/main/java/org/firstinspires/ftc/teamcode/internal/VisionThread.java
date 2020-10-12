@@ -209,15 +209,15 @@ public class VisionThread extends Thread {
                                 robot.orientation = orientation;
                             } else {
                                 skystoneVisible = true;
-                                robot.skystonePosition = position;
-                                robot.skystoneOrientation = orientation;
+                                robot.itemPosition = position;
+                                robot.itemOrientation = orientation;
                             }
                         }
                     }
                 }
 
-                robot.targetVisible = targetVisible;
-                robot.skystoneVisible = skystoneVisible;
+                robot.navigationTargetVisible = targetVisible;
+                robot.itemVisible = skystoneVisible;
 
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 

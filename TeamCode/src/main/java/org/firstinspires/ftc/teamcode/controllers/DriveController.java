@@ -21,7 +21,19 @@ public class DriveController extends RobotController {
     private void driveStandard() {
         double drive = -gamepad1.left_stick_y;
         double turn = gamepad1.right_stick_x;
-        robot.drive(drive * POWER,0, turn * POWER,0);
+
+        double left = POWER*(drive+turn);
+        double right = POWER*(drive-turn);
+
+        double max = Math.max(Math.abs(left), Math.abs(right));
+
+        if (max > 1.0) {
+            left /= max;
+            right /= max;
+        }
+
+        robot.drive(left, left, right, right);
+
     }
 
     private void driveMecanum() {

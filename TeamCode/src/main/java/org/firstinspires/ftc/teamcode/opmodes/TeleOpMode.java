@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.controllers.DiagnosticController;
 import org.firstinspires.ftc.teamcode.controllers.DriveController;
 import org.firstinspires.ftc.teamcode.controllers.LightsController;
 import org.firstinspires.ftc.teamcode.controllers.RecorderController;
@@ -25,6 +26,7 @@ public class TeleOpMode extends OpMode {
     @Override
     protected void execute() {
         robotControllers = new RobotController[]{
+            new DiagnosticController(this),
             new RecorderController(this),
             new DriveController(this),
             new LightsController(this),
