@@ -44,11 +44,6 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.INTRINSIC;
 import static org.firstinspires.ftc.teamcode.internal.Robot.ClawPosition.CLOSE;
 import static org.firstinspires.ftc.teamcode.internal.Robot.ClawPosition.OPEN;
-import static org.firstinspires.ftc.teamcode.internal.Robot.SlidePosition.IN;
-import static org.firstinspires.ftc.teamcode.internal.Robot.SlidePosition.OUT;
-import static org.firstinspires.ftc.teamcode.internal.Robot.TiltPosition.BACK;
-import static org.firstinspires.ftc.teamcode.internal.Robot.TiltPosition.TILTED;
-import static org.firstinspires.ftc.teamcode.internal.Robot.TiltPosition.UP;
 
 public class Robot {
     private static final double INCHES_PER_ROTATION = 3.95 * Math.PI;
@@ -69,6 +64,12 @@ public class Robot {
     private DcMotor left_rear;
     private DcMotor right_front;
     private DcMotor right_rear;
+
+    //Creating motors for mecanum wheels
+    private DcMotor mec_lf;
+    private DcMotor mec_lb;
+    private DcMotor mec_rf;
+    private DcMotor mec_rb;
 
     private DcMotor slide;
     private DigitalChannel slide_limit_front;
@@ -107,6 +108,8 @@ public class Robot {
     public List<Recognition> recognitions = null;
 
     public String error;
+
+    public boolean mecanumMode = true;
 
     public Robot(OpMode opMode) {
         this.opMode = opMode;
@@ -193,16 +196,11 @@ public class Robot {
 
     public void calibrate() {
         setLights(CALIBRATE_COLOR);
-        if (tilt.getCurrentPosition() == 0) tiltReset();
-        tilt(BACK);
-        slide(IN);
         setLights(READY_COLOR);
     }
 
     public void start() {
         setLights(DEFAULT_COLOR);
-        slide(OUT);
-        if (tilt.getCurrentPosition() == 0) tiltReset();
     }
 
     public void drive(double power, double turn) {
@@ -228,6 +226,35 @@ public class Robot {
         left_rear.setPower(left);
         right_front.setPower(right);
         right_rear.setPower(right);
+    }
+
+    public void drive(double lf, double lb, double rf, double rb){
+
+        if(mecanumMode){
+            mec_lf.setPower(lf);
+            mec_lb.setPower(lb);
+            mec_rf.setPower(rf);
+            mec_rb.setPower(rb);
+        }
+        else{
+            if (!opMode.isContinuing()) return;
+
+            double left = lf;
+            double right = rf;
+
+            double max = Math.max(Math.abs(left), Math.abs(right));
+
+            if (max > 1.0) {
+                left /= max;
+                right /= max;
+            }
+
+            left_front.setPower(left);
+            left_rear.setPower(left);
+            right_front.setPower(right);
+            right_rear.setPower(right);
+        }
+
     }
 
     public void drive(double power, double heading, double inches) {
@@ -273,92 +300,6 @@ public class Robot {
         } while (opMode.isContinuing() && (remainder < -1 || remainder > 1));
 
         drive(0,0);
-    }
-
-    public enum SlidePosition{ IN, OUT }
-
-    public void slide(SlidePosition position) {
-        if (!opMode.isContinuing()) return;
-
-        final double power = 0.5;
-
-        if (position == OUT) {
-            while (opMode.isContinuing() && slide_limit_rear.getState()) {
-                slide.setPower(power);
-            }
-        }
-
-        if (position == IN) {
-            while (opMode.isContinuing() && slide_limit_front.getState() && tilt_accelerometer.getAcceleration().yAccel > TILTED.accel) {
-                slide.setMode(RUN_USING_ENCODER);
-                slide.setPower(-power);
-            }
-        }
-
-        slide.setPower(0);
-    }
-
-    public enum TiltPosition {
-        BACK(9.8, 0), TILTED(7.0, 1000), UP(-1.0, 3400), FOUNDATION(-2.0,3600);
-
-        public double accel;
-        public int ticks;
-
-        TiltPosition(double accel, int ticks) {
-            this.accel = accel;
-            this.ticks = ticks;
-        }
-    }
-
-    public void tilt(double power) {
-        if (!opMode.isContinuing() || isUntiltable(power)) return;
-        tilt.setMode(RUN_USING_ENCODER);
-        tilt.setPower(power);
-    }
-
-    public void tilt(TiltPosition position) {
-        if (!opMode.isContinuing() || isUntiltable(0)) return;
-        tiltAsync(position);
-        while (opMode.isContinuing() && isUntiltable(0));
-    }
-
-    public void tiltAsync(TiltPosition position) {
-        if (!opMode.isContinuing() || isUntiltable(0)) return;
-        tiltIsBusy = true;
-        tilt.setTargetPosition(position.ticks);
-        tilt.setMode(RUN_TO_POSITION);
-        tilt.setPower(0.5);
-    }
-
-    protected void tiltReset() {
-        tiltAccel(TILTED);
-        tiltAccel(BACK);
-        tilt.setMode(STOP_AND_RESET_ENCODER);
-    }
-
-    protected void tiltAccel(TiltPosition position) {
-        while (opMode.isContinuing()) {
-            Acceleration acceleration = tilt_accelerometer.getAcceleration();
-            double remainder = acceleration.yAccel - position.accel;
-            double power = clamp(0.25, 1, remainder / 10);
-            if (remainder > -0.25 && remainder < 0.25) break;
-            tilt.setPower(power);
-        }
-
-        tilt.setPower(0);
-    }
-
-    private boolean isUntiltable(double power) {
-        if (tiltIsBusy) {
-            tiltIsBusy = tilt.isBusy();
-        }
-
-        double yAccel = tilt_accelerometer.getAcceleration().yAccel;
-
-        return tiltIsBusy ||
-            slide_limit_rear.getState() ||
-            (power < 0 && yAccel > BACK.accel) ||
-            (power > 0 && yAccel < UP.accel);
     }
 
     public void lift(double power) {
@@ -445,10 +386,8 @@ public class Robot {
         drive(0,0);
 
         claw(OPEN);
-        tilt(UP);
         drive(power, getOrientation().firstAngle,12);
         claw(CLOSE);
-        tilt(TILTED);
 
         setLights(PICKUP_COLOR);
         sleep(0.5);
@@ -493,10 +432,8 @@ public class Robot {
         );
 
         claw(OPEN);
-        tilt(UP);
         drive(power, heading, inches - 6);
         claw(CLOSE);
-        tilt(TILTED);
 
         setLights(PICKUP_COLOR);
         sleep(0.5);
@@ -526,7 +463,6 @@ public class Robot {
         telemetry.addData("Tilt","%.2f Pow, %d Pos", tilt.getPower(), tilt.getCurrentPosition());
         telemetry.addData("Tilt Limit", tilt_limit.getState());
         telemetry.addData("Tilt Accelerometer", tilt_accelerometer.getAcceleration());
-        telemetry.addData("Tilt isUntiltable", isUntiltable(0));
         telemetry.addData("Lift","%.2f Pow, %d Pos", lift.getPower(), lift.getCurrentPosition());
         telemetry.addData("Target Visible", targetVisible);
         telemetry.addData("Position (in)", position);

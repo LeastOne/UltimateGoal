@@ -11,8 +11,13 @@ public class DriveController extends RobotController {
 
     @Override
     public void execute() {
-        double drive = -gamepad1.left_stick_y;
-        double turn = gamepad1.right_stick_x;
-        robot.drive(drive * POWER, turn * POWER);
+        if(!robot.mecanumMode){
+            double drive = -gamepad1.left_stick_y;
+            double turn = gamepad1.right_stick_x;
+            robot.drive(drive * POWER,0, turn * POWER,0);
+        }
+        else{
+            if(gamepad1.left_stick_button&&gamepad1.right_stick_button){robot.mecanumMode=false;}
+        }
     }
 }
