@@ -61,6 +61,11 @@ public class Robot {
     private DcMotor right_front;
     private DcMotor right_rear;
 
+    private DcMotor eh_motor_0;
+    private DcMotor eh_motor_1;
+    private DcMotor eh_motor_2;
+    private DcMotor eh_motor_3;
+
     private RevBlinkinLedDriver lights;
 
     private VisionThread visionThread;
@@ -117,6 +122,10 @@ public class Robot {
         right_rear.setMode(RUN_USING_ENCODER);
         right_rear.setDirection(REVERSE);
 
+        eh_motor_0 = hardwareMap.get(DcMotor.class, "eh_motor_0");
+        eh_motor_1 = hardwareMap.get(DcMotor.class, "eh_motor_1");
+        eh_motor_2 = hardwareMap.get(DcMotor.class, "eh_motor_2");
+        eh_motor_3 = hardwareMap.get(DcMotor.class, "eh_motor_3");
 
         lights = hardwareMap.get(RevBlinkinLedDriver.class,"lights");
 
@@ -239,6 +248,13 @@ public class Robot {
 
         // Linear Equation: y(x) = y1 + ((y2 - y1) / (x2 - x1)) * (x - x1)
         return y1 + ((y2 - y1) / (x2 - x1)) * (item.getHeight() - x1);
+    }
+
+    public void setAttachmentMotorPower(double power0, double power1, double power2, double power3){
+        eh_motor_0.setPower(power0);
+        eh_motor_1.setPower(power1);
+        eh_motor_2.setPower(power2);
+        eh_motor_3.setPower(power3);
     }
 
     //more than 10 is 1
