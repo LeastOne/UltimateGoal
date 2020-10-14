@@ -254,6 +254,10 @@ public class Robot {
 
         orientation = getOrientation();
 
+        if (this.diagnosticMode){
+            telemetry.addLine("DIAGNOSTIC MODE!!!!!");
+        }
+
         telemetry.addData("Drive","%.2f Pow", opMode.gamepad2.left_stick_y);
         telemetry.addData("Turn","%.2f Pow", opMode.gamepad2.right_stick_x);
         telemetry.addData("Drive (LF)","%.2f Pow, %d Pos", ch_drive_lf.getPower(), ch_drive_lf.getCurrentPosition());
