@@ -53,10 +53,10 @@ public class Robot {
 
     private BNO055IMU imu;
 
-    private DcMotor left_front;
-    private DcMotor left_rear;
-    private DcMotor right_front;
-    private DcMotor right_rear;
+    private DcMotor ch_drive_lf;
+    private DcMotor ch_drive_lr;
+    private DcMotor ch_drive_rf;
+    private DcMotor ch_drive_rr;
 
     private DcMotor eh_motor_0;
     private DcMotor eh_motor_1;
@@ -102,22 +102,25 @@ public class Robot {
         imu = hardwareMap.get(BNO055IMU.class, "ch_i2c_0");
         imu.initialize(parameters);
 
-        left_front = hardwareMap.get(DcMotor.class, "left_front");
-        left_front.setMode(STOP_AND_RESET_ENCODER);
-        left_front.setMode(RUN_USING_ENCODER);
-        left_front.setDirection(FORWARD);
-        left_rear = hardwareMap.get(DcMotor.class,"left_rear");
-        left_rear.setMode(STOP_AND_RESET_ENCODER);
-        left_rear.setMode(RUN_USING_ENCODER);
-        left_rear.setDirection(FORWARD);
-        right_front = hardwareMap.get(DcMotor.class,"right_front");
-        right_front.setMode(STOP_AND_RESET_ENCODER);
-        right_front.setMode(RUN_USING_ENCODER);
-        right_front.setDirection(REVERSE);
-        right_rear = hardwareMap.get(DcMotor.class, "right_rear");
-        right_rear.setMode(STOP_AND_RESET_ENCODER);
-        right_rear.setMode(RUN_USING_ENCODER);
-        right_rear.setDirection(REVERSE);
+        ch_drive_lf = hardwareMap.get(DcMotor.class, "ch_drive_lf");
+        ch_drive_lf.setMode(STOP_AND_RESET_ENCODER);
+        ch_drive_lf.setMode(RUN_USING_ENCODER);
+        ch_drive_lf.setDirection(FORWARD);
+
+        ch_drive_rf = hardwareMap.get(DcMotor.class,"ch_drive_rf");
+        ch_drive_rf.setMode(STOP_AND_RESET_ENCODER);
+        ch_drive_rf.setMode(RUN_USING_ENCODER);
+        ch_drive_rf.setDirection(REVERSE);
+
+        ch_drive_lr = hardwareMap.get(DcMotor.class,"ch_drive_lr");
+        ch_drive_lr.setMode(STOP_AND_RESET_ENCODER);
+        ch_drive_lr.setMode(RUN_USING_ENCODER);
+        ch_drive_lr.setDirection(FORWARD);
+
+        ch_drive_rr = hardwareMap.get(DcMotor.class, "ch_drive_rr");
+        ch_drive_rr.setMode(STOP_AND_RESET_ENCODER);
+        ch_drive_rr.setMode(RUN_USING_ENCODER);
+        ch_drive_rr.setDirection(REVERSE);
 
         eh_motor_0 = hardwareMap.get(DcMotor.class, "eh_motor_0");
         eh_motor_1 = hardwareMap.get(DcMotor.class, "eh_motor_1");
@@ -168,19 +171,19 @@ public class Robot {
             right /= max;
         }
 
-        left_front.setPower(left);
-        left_rear.setPower(left);
-        right_front.setPower(right);
-        right_rear.setPower(right);
+        ch_drive_lf.setPower(left);
+        ch_drive_lr.setPower(left);
+        ch_drive_rf.setPower(right);
+        ch_drive_rr.setPower(right);
     }
 
     public void drive(double lf, double lr, double rf, double rr) {
         if (!opMode.isContinuing()) return;
 
-        left_front.setPower(lf);
-        left_rear.setPower(lr);
-        right_front.setPower(rf);
-        right_rear.setPower(rr);
+        ch_drive_lf.setPower(lf);
+        ch_drive_lr.setPower(lr);
+        ch_drive_rf.setPower(rf);
+        ch_drive_rr.setPower(rr);
     }
 
     public void drive(double power, double heading, double inches) {
@@ -200,10 +203,10 @@ public class Robot {
             drive(power, turn);
 
             position = (
-                Math.abs(left_front.getCurrentPosition()) +
-                Math.abs(left_rear.getCurrentPosition()) +
-                Math.abs(right_front.getCurrentPosition()) +
-                Math.abs(right_rear.getCurrentPosition())
+                Math.abs(ch_drive_lf.getCurrentPosition()) +
+                Math.abs(ch_drive_lr.getCurrentPosition()) +
+                Math.abs(ch_drive_rf.getCurrentPosition()) +
+                Math.abs(ch_drive_rr.getCurrentPosition())
             ) / 4;
         }
 
@@ -253,10 +256,10 @@ public class Robot {
 
         telemetry.addData("Drive","%.2f Pow", opMode.gamepad2.left_stick_y);
         telemetry.addData("Turn","%.2f Pow", opMode.gamepad2.right_stick_x);
-        telemetry.addData("Drive (LF)","%.2f Pow, %d Pos", left_front.getPower(), left_front.getCurrentPosition());
-        telemetry.addData("Drive (LR)","%.2f Pow, %d Pos", left_rear.getPower(), left_rear.getCurrentPosition());
-        telemetry.addData("Drive (RF)","%.2f Pow, %d Pos", right_front.getPower(), right_front.getCurrentPosition());
-        telemetry.addData("Drive (RR)","%.2f Pow, %d Pos", right_rear.getPower(), right_rear.getCurrentPosition());
+        telemetry.addData("Drive (LF)","%.2f Pow, %d Pos", ch_drive_lf.getPower(), ch_drive_lf.getCurrentPosition());
+        telemetry.addData("Drive (LR)","%.2f Pow, %d Pos", ch_drive_lr.getPower(), ch_drive_lr.getCurrentPosition());
+        telemetry.addData("Drive (RF)","%.2f Pow, %d Pos", ch_drive_rf.getPower(), ch_drive_rf.getCurrentPosition());
+        telemetry.addData("Drive (RR)","%.2f Pow, %d Pos", ch_drive_rr.getPower(), ch_drive_rr.getCurrentPosition());
         telemetry.addData("Target Visible", navigationTargetVisible);
         telemetry.addData("Position (in)", position);
         telemetry.addData("Orientation", orientation);
@@ -299,14 +302,14 @@ public class Robot {
     }
 
     private void resetEncoders() {
-        left_front.setMode(STOP_AND_RESET_ENCODER);
-        left_front.setMode(RUN_USING_ENCODER);
-        left_rear.setMode(STOP_AND_RESET_ENCODER);
-        left_rear.setMode(RUN_USING_ENCODER);
-        right_front.setMode(STOP_AND_RESET_ENCODER);
-        right_front.setMode(RUN_USING_ENCODER);
-        right_rear.setMode(STOP_AND_RESET_ENCODER);
-        right_rear.setMode(RUN_USING_ENCODER);
+        ch_drive_lf.setMode(STOP_AND_RESET_ENCODER);
+        ch_drive_lf.setMode(RUN_USING_ENCODER);
+        ch_drive_lr.setMode(STOP_AND_RESET_ENCODER);
+        ch_drive_lr.setMode(RUN_USING_ENCODER);
+        ch_drive_rf.setMode(STOP_AND_RESET_ENCODER);
+        ch_drive_rf.setMode(RUN_USING_ENCODER);
+        ch_drive_rr.setMode(STOP_AND_RESET_ENCODER);
+        ch_drive_rr.setMode(RUN_USING_ENCODER);
     }
 
     private double clamp(double min, double max, double value) {
