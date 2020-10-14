@@ -102,7 +102,7 @@ public class Robot {
         parameters.loggingEnabled = true;
         parameters.loggingTag = "IMU";
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu = hardwareMap.get(BNO055IMU.class, "ch_i2c_0");
         imu.initialize(parameters);
 
         left_front = hardwareMap.get(DcMotor.class, "left_front");
