@@ -63,7 +63,7 @@ public class Robot {
     private DcMotor eh_motor_2;
     private DcMotor eh_motor_3;
 
-    private RevBlinkinLedDriver lights;
+    private RevBlinkinLedDriver eh_servo_5;
 
     private VisionThread visionThread;
 
@@ -127,7 +127,7 @@ public class Robot {
         eh_motor_2 = hardwareMap.get(DcMotor.class, "eh_motor_2");
         eh_motor_3 = hardwareMap.get(DcMotor.class, "eh_motor_3");
 
-        lights = hardwareMap.get(RevBlinkinLedDriver.class,"lights");
+        eh_servo_5 = hardwareMap.get(RevBlinkinLedDriver.class,"eh_servo_5");
 
         webcamName = hardwareMap.get(WebcamName.class,"Webcam 1");
         cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -230,7 +230,7 @@ public class Robot {
     }
 
     public void setLights (RevBlinkinLedDriver.BlinkinPattern pattern) {
-        lights.setPattern(pattern == BLACK ? DEFAULT_COLOR : pattern);
+        eh_servo_5.setPattern(pattern == BLACK ? DEFAULT_COLOR : pattern);
     }
 
     private double getOffset(Recognition item) {
