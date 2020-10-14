@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode.internal;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cCompassSensor;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -171,26 +168,19 @@ public class Robot {
             right /= max;
         }
 
-//        double maxChange = 0.33;
-//        double leftCurrent = left_front.getPower();
-//        double rightCurrent = right_front.getPower();
-//        if (left != 0) left = leftCurrent + clamp(-maxChange, maxChange, left - leftCurrent);
-//        if (right != 0) right = rightCurrent + clamp(-maxChange, maxChange, right - rightCurrent);
-
         left_front.setPower(left);
         left_rear.setPower(left);
         right_front.setPower(right);
         right_rear.setPower(right);
     }
 
-    public void drive(double lf, double lb, double rf, double rb){
-
+    public void drive(double lf, double lr, double rf, double rr) {
         if (!opMode.isContinuing()) return;
 
         left_front.setPower(lf);
-        left_rear.setPower(lb);
+        left_rear.setPower(lr);
         right_front.setPower(rf);
-        right_rear.setPower(rb);
+        right_rear.setPower(rr);
     }
 
     public void drive(double power, double heading, double inches) {
@@ -236,12 +226,11 @@ public class Robot {
         drive(0,0);
     }
 
-    public void setLights (RevBlinkinLedDriver.BlinkinPattern pattern){
+    public void setLights (RevBlinkinLedDriver.BlinkinPattern pattern) {
         lights.setPattern(pattern == BLACK ? DEFAULT_COLOR : pattern);
     }
 
-    private double getOffset(Recognition item){
-
+    private double getOffset(Recognition item) {
         // Linear Coordinates
         final double x1 = 140/*height*/, y1 = 14/*degrees*/;
         final double x2 = 254/*height*/, y2 = 9/*degrees*/;
@@ -250,16 +239,12 @@ public class Robot {
         return y1 + ((y2 - y1) / (x2 - x1)) * (item.getHeight() - x1);
     }
 
-    public void setAttachmentMotorPower(double power0, double power1, double power2, double power3){
+    public void setAttachmentMotorPower(double power0, double power1, double power2, double power3) {
         eh_motor_0.setPower(power0);
         eh_motor_1.setPower(power1);
         eh_motor_2.setPower(power2);
         eh_motor_3.setPower(power3);
     }
-
-    //more than 10 is 1
-    //between -10 and 10 is 2
-    //less than -10 is 3
 
     public void addTelemetry(){
         Telemetry telemetry = opMode.telemetry;
@@ -293,12 +278,8 @@ public class Robot {
                 telemetry.addData("  offset", "%.3f", getOffset(recognition));
                 telemetry.addData("  heading", "%.3f", recognition.estimateAngleToObject(DEGREES) + getOffset(recognition));
                 telemetry.addData("  area", "%.3f", recognition.getWidth() * recognition.getHeight());
-
             }
         }
-
-
-
 
         if (error != null && !error.isEmpty())
             telemetry.addData("Error", error);
@@ -333,6 +314,4 @@ public class Robot {
             Math.min(max, Math.max(min, value)) :
             Math.min(-min, Math.max(-max, value));
     }
-
-
 }

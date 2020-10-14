@@ -34,7 +34,7 @@ public class RecorderController extends RobotController {
     }
 
     @Override
-    public void execute(){
+    public void execute() {
         switch(state){
             case IDLE:
                 if(gamepad1.start) enterRecording();
@@ -103,7 +103,7 @@ public class RecorderController extends RobotController {
         File file = AppUtil.getInstance().getSettingsFile(filename);
         ReadWriteFile.writeFile(file,json);
     }
-    private void load(){
+    private void load() {
         try {
             File file = AppUtil.getInstance().getSettingsFile(filename);
             String json = ReadWriteFile.readFileOrThrow(file);
