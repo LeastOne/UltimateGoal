@@ -123,18 +123,37 @@ public class Robot {
         ch_drive_rr.setDirection(REVERSE);
 
         eh_motor_0 = hardwareMap.get(DcMotor.class, "eh_motor_0");
+        eh_motor_0.setMode(STOP_AND_RESET_ENCODER);
+        eh_motor_0.setMode(RUN_USING_ENCODER);
+        eh_motor_0.setDirection(FORWARD);
+
         eh_motor_1 = hardwareMap.get(DcMotor.class, "eh_motor_1");
+        eh_motor_1.setMode(STOP_AND_RESET_ENCODER);
+        eh_motor_1.setMode(RUN_USING_ENCODER);
+        eh_motor_1.setDirection(FORWARD);
+
         eh_motor_2 = hardwareMap.get(DcMotor.class, "eh_motor_2");
+        eh_motor_2.setMode(STOP_AND_RESET_ENCODER);
+        eh_motor_2.setMode(RUN_USING_ENCODER);
+        eh_motor_2.setDirection(FORWARD);
+
         eh_motor_3 = hardwareMap.get(DcMotor.class, "eh_motor_3");
+        eh_motor_3.setMode(STOP_AND_RESET_ENCODER);
+        eh_motor_3.setMode(RUN_USING_ENCODER);
+        eh_motor_3.setDirection(FORWARD);
 
         eh_servo_5 = hardwareMap.get(RevBlinkinLedDriver.class,"eh_servo_5");
 
-        webcamName = hardwareMap.get(WebcamName.class,"Webcam 1");
-        cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId","id",hardwareMap.appContext.getPackageName());
+        try {
+            webcamName = hardwareMap.get(WebcamName.class,"Webcam 1");
+            cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+            tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId","id",hardwareMap.appContext.getPackageName());
 
-        visionThread = new VisionThread(opMode,this);
-        visionThread.start();
+            visionThread = new VisionThread(opMode,this);
+            visionThread.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (alliance == Alliance.RED) {
             DEFAULT_COLOR = RED;
