@@ -94,7 +94,7 @@ public class RecorderController extends RobotController {
         gamepads = new ArrayList<>();
         state = RECORDING;
         SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd--hh-mm-ss");
-        filename = sim.format(new Date()) + ".json";
+        filename = "recordings/" + sim.format(new Date()) + ".json";
     }
 
     private void enterReplaying() {
