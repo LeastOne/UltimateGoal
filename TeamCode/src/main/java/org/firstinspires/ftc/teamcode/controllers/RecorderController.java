@@ -39,8 +39,12 @@ public class RecorderController extends RobotController {
     public void execute() {
         switch(state) {
             case IDLE:
-                if (gamepad1.start) enterRecording();
-                if (gamepad1.a) enterReplaying();
+                if (gamepad1.start && gamepad1.y ) enterRecording();
+                if (!gamepad1.start && gamepad1.y) enterReplaying();
+                if (gamepad1.x && gamepad1.dpad_left) selectPrevRecordingBlueAlliance();
+                if (gamepad1.x && gamepad1.dpad_right) selectNextRecordingBlueAlliance();
+                if (gamepad1.b && gamepad1.dpad_left) selectPrevRecordingRedAlliance();
+                if (gamepad1.b && gamepad1.dpad_right) selectNextRecordingRedAlliance();
                 break;
             case RECORDING:
                 if (gamepad1.back) enterIdle();
