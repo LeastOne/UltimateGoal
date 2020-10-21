@@ -9,7 +9,9 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.opmodes.OpMode;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecorderState.IDLE;
@@ -23,7 +25,7 @@ public class RecorderController extends RobotController {
         REPLAYING
     }
 
-    private String filename = "recorder-data.json";
+    private String filename;
 
     private RecorderState state = IDLE;
 
@@ -35,18 +37,18 @@ public class RecorderController extends RobotController {
 
     @Override
     public void execute() {
-        switch(state){
+        switch(state) {
             case IDLE:
-                if(gamepad1.start) enterRecording();
-                if(gamepad1.a) enterReplaying();
+                if (gamepad1.start) enterRecording();
+                if (gamepad1.a) enterReplaying();
                 break;
             case RECORDING:
-                if(gamepad1.back) enterIdle();
+                if (gamepad1.back) enterIdle();
                 else record();
                 break;
             case REPLAYING:
-                if(gamepad1.back) enterIdle();
-                else if(gamepads.size() != 0) replay();
+                if (gamepad1.back) enterIdle();
+                else if (gamepads.size() != 0) replay();
                 else enterIdle();
                 break;
         }
@@ -84,16 +86,20 @@ public class RecorderController extends RobotController {
     }
 
     private void enterIdle() {
-        if(state == RECORDING){save();}
+        if (state == RECORDING) save();
         state = IDLE;
     }
 
     private void enterRecording() {
         gamepads = new ArrayList<>();
         state = RECORDING;
+        SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd--hh-mm-ss");
+        filename = sim.format(new Date()) + ".json";
     }
 
     private void enterReplaying() {
+        //File directory = new File("./");
+        //File[] files = directory.listFiles();
         state = REPLAYING;
         load();
     }
