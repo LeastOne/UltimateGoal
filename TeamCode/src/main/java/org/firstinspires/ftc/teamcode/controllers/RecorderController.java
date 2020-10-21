@@ -108,11 +108,28 @@ public class RecorderController extends RobotController {
         load();
     }
 
+    private void selectPrevRecordingBlueAlliance() {
+        //todo
+    }
+
+    private void selectNextRecordingBlueAlliance() {
+        //todo
+    }
+
+    private void selectPrevRecordingRedAlliance() {
+        //todo
+    }
+
+    private void selectNextRecordingRedAlliance() {
+        //todo
+    }
+
     private void save() {
         String json = SimpleGson.getInstance().toJson(gamepads.toArray());
         File file = AppUtil.getInstance().getSettingsFile(filename);
         ReadWriteFile.writeFile(file,json);
     }
+
     private void load() {
         try {
             File file = AppUtil.getInstance().getSettingsFile(filename);
