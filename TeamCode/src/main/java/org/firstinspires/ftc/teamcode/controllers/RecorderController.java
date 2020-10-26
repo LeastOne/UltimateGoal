@@ -25,7 +25,18 @@ public class RecorderController extends RobotController {
         REPLAYING
     }
 
-    private String filename;
+    public class RecorderSettings {
+
+    }
+
+    public enum RecordSelect{
+        PREV,
+        NEXT
+    }
+
+    private String currentFileName;
+    private String redFileName;
+    private String blueFileName;
 
     private RecorderState state = IDLE;
 
@@ -40,11 +51,13 @@ public class RecorderController extends RobotController {
         switch(state) {
             case IDLE:
                 if (gamepad1.start && gamepad1.y ) enterRecording();
-                if (!gamepad1.start && gamepad1.y) enterReplaying();
-                if (gamepad1.x && gamepad1.dpad_left) selectPrevRecordingBlueAlliance();
-                if (gamepad1.x && gamepad1.dpad_right) selectNextRecordingBlueAlliance();
-                if (gamepad1.b && gamepad1.dpad_left) selectPrevRecordingRedAlliance();
-                if (gamepad1.b && gamepad1.dpad_right) selectNextRecordingRedAlliance();
+                if (gamepad1.y && !gamepad1.atRest()) enterReplaying();
+                if(gamepad1.x && !gamepad1.atRest()) enterReplaying();
+                if(gamepad1.b && !gamepad1.atRest()) enterReplaying();
+                if (gamepad1.x && gamepad1.dpad_left) blueFileName = selectRecording(blueFileName, RecordSelect.PREV);
+                if (gamepad1.x && gamepad1.dpad_right) blueFileName = selectRecording(blueFileName, RecordSelect.NEXT);
+                if (gamepad1.b && gamepad1.dpad_left) redFileName = selectRecording(redFileName, RecordSelect.PREV);
+                if (gamepad1.b && gamepad1.dpad_right) redFileName = selectRecording(redFileName, RecordSelect.NEXT);
                 break;
             case RECORDING:
                 if (gamepad1.back) enterIdle();
@@ -98,7 +111,7 @@ public class RecorderController extends RobotController {
         gamepads = new ArrayList<>();
         state = RECORDING;
         SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd--hh-mm-ss");
-        filename = "recordings/" + sim.format(new Date()) + ".json";
+        currentFileName = "recordings/" + sim.format(new Date()) + ".json";
     }
 
     private void enterReplaying() {
@@ -108,8 +121,8 @@ public class RecorderController extends RobotController {
         load();
     }
 
-    private void selectPrevRecordingBlueAlliance() {
-        //todo
+    private String selectRecording(String filename, RecordSelect select) {
+        return null;
     }
 
     private void selectNextRecordingBlueAlliance() {
@@ -126,13 +139,13 @@ public class RecorderController extends RobotController {
 
     private void save() {
         String json = SimpleGson.getInstance().toJson(gamepads.toArray());
-        File file = AppUtil.getInstance().getSettingsFile(filename);
+        File file = AppUtil.getInstance().getSettingsFile(currentFileName);
         ReadWriteFile.writeFile(file,json);
     }
 
     private void load() {
         try {
-            File file = AppUtil.getInstance().getSettingsFile(filename);
+            File file = AppUtil.getInstance().getSettingsFile(currentFileName);
             String json = ReadWriteFile.readFileOrThrow(file);
             gamepads = SimpleGson.getInstance().fromJson(json, new TypeToken<List<Gamepad>>(){}.getType());
         } catch(Exception e) {
