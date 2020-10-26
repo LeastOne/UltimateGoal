@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.controllers.DriveController;
 import org.firstinspires.ftc.teamcode.controllers.LightsController;
 import org.firstinspires.ftc.teamcode.controllers.RecorderController;
 import org.firstinspires.ftc.teamcode.controllers.RobotController;
+import org.firstinspires.ftc.teamcode.controllers.WobbleLatchController;
 import org.firstinspires.ftc.teamcode.internal.Alliance;
 
 import static org.firstinspires.ftc.teamcode.internal.Alliance.UNKNOWN;
@@ -30,6 +31,7 @@ public class TeleOpMode extends OpMode {
             new RecorderController(this),
             new DriveController(this),
             new LightsController(this),
+            new WobbleLatchController(this)
         };
 
         while (isActive()) {

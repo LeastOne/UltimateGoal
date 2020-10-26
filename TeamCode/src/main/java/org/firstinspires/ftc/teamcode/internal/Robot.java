@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -63,6 +64,8 @@ public class Robot {
     private DcMotor eh_motor_2;
     private DcMotor eh_motor_3;
 
+
+    private Servo eh_servo_0;
     private RevBlinkinLedDriver eh_servo_5;
 
     private VisionThread visionThread;
@@ -142,6 +145,7 @@ public class Robot {
         eh_motor_3.setMode(RUN_USING_ENCODER);
         eh_motor_3.setDirection(FORWARD);
 
+        eh_servo_0 = hardwareMap.get(Servo.class,"eh_servo_0");
         eh_servo_5 = hardwareMap.get(RevBlinkinLedDriver.class,"eh_servo_5");
 
         try {
@@ -266,6 +270,15 @@ public class Robot {
         eh_motor_1.setPower(power1);
         eh_motor_2.setPower(power2);
         eh_motor_3.setPower(power3);
+    }
+
+    public enum WobbleLatchPosition{
+        OPEN,CLOSED
+    }
+
+    public void wobbleLatch(WobbleLatchPosition position){
+        if (position == WobbleLatchPosition.OPEN) eh_servo_0.setPosition(0.25);
+        if (position == WobbleLatchPosition.CLOSED) eh_servo_0.setPosition(-0.25);
     }
 
     public void addTelemetry(){
