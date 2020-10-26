@@ -268,6 +268,22 @@ public class Robot {
         eh_motor_3.setPower(power3);
     }
 
+    public void wobbleArm(){
+
+        eh_motor_2.setPower(0.05);
+
+        int lastPosition = 0;
+        int currPosition = 0;
+
+        do {
+            opMode.sleep(50);
+            lastPosition = currPosition;
+            currPosition = eh_motor_2.getCurrentPosition();
+        } while (currPosition!=lastPosition);
+
+        eh_motor_2.setPower(0);
+    }
+
     public void addTelemetry(){
         Telemetry telemetry = opMode.telemetry;
 
