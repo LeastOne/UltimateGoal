@@ -245,12 +245,18 @@ public class Robot {
     }
 
     public enum WobbleLatchPosition {
-        OPEN, CLOSED
+        OPEN(0.25), CLOSED(-0.25);
+
+        public double value;
+
+        WobbleLatchPosition(double value){
+            this.value = value;
+        }
     }
 
+
     public void wobbleLatch(WobbleLatchPosition position) {
-        if (position == WobbleLatchPosition.OPEN) eh_servo_0.setPosition(0.25);
-        if (position == WobbleLatchPosition.CLOSED) eh_servo_0.setPosition(-0.25);
+        eh_servo_0.setPosition(position.value);
     }
 
     public void addTelemetry(){
