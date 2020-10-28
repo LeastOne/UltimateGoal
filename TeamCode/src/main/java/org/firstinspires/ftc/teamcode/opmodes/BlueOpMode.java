@@ -9,5 +9,4 @@ public abstract class BlueOpMode extends TeleOpMode {
     protected Alliance getAlliance() {
         return BLUE;
     }
-
 }

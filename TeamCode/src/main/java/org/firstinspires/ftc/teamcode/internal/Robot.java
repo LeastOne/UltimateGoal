@@ -4,6 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -63,6 +64,8 @@ public class Robot {
     private DcMotor eh_motor_2;
     private DcMotor eh_motor_3;
 
+
+    private Servo eh_servo_0;
     private RevBlinkinLedDriver eh_servo_5;
 
     private VisionThread visionThread;
@@ -142,6 +145,7 @@ public class Robot {
         eh_motor_3.setMode(RUN_USING_ENCODER);
         eh_motor_3.setDirection(FORWARD);
 
+        eh_servo_0 = hardwareMap.get(Servo.class,"eh_servo_0");
         eh_servo_5 = hardwareMap.get(RevBlinkinLedDriver.class,"eh_servo_5");
 
         try {
@@ -205,49 +209,6 @@ public class Robot {
         ch_drive_rr.setPower(rr);
     }
 
-    public void drive(double power, double heading, double inches) {
-        if (!opMode.isContinuing()) return;
-
-        turn(power, heading);
-
-        int targetPosition = (int)(inches * TICKS_PER_INCH);
-        int position = 0;
-
-        double remainder, turn;
-
-        while (opMode.isContinuing() && targetPosition - position > 0) {
-            remainder = getRemainderLeftToTurn(heading);
-            power = clamp(0.2, power, (1 - (double)position / targetPosition) * TICKS_PER_INCH * 12);
-            turn = remainder / 45;
-            drive(power, turn);
-
-            position = (
-                Math.abs(ch_drive_lf.getCurrentPosition()) +
-                Math.abs(ch_drive_lr.getCurrentPosition()) +
-                Math.abs(ch_drive_rf.getCurrentPosition()) +
-                Math.abs(ch_drive_rr.getCurrentPosition())
-            ) / 4;
-        }
-
-        this.drive(0,0);
-    }
-
-    public void turn(double power, double heading) {
-        if (!opMode.isContinuing()) return;
-
-        power = Math.abs(power);
-
-        double remainder, turn;
-
-        do {
-            remainder = getRemainderLeftToTurn(heading);
-            turn = clamp(0.2, power, remainder / 45 * power);
-            drive(0, turn);
-        } while (opMode.isContinuing() && (remainder < -1 || remainder > 1));
-
-        drive(0,0);
-    }
-
     public void setLights (RevBlinkinLedDriver.BlinkinPattern pattern) {
         eh_servo_5.setPattern(pattern == BLACK ? DEFAULT_COLOR : pattern);
     }
@@ -268,8 +229,7 @@ public class Robot {
         eh_motor_3.setPower(power3);
     }
 
-    public void wobbleArm(){
-
+    public void wobbleArm() {
         eh_motor_2.setPower(0.05);
 
         int lastPosition = 0;
@@ -279,19 +239,24 @@ public class Robot {
             opMode.sleep(50);
             lastPosition = currPosition;
             currPosition = eh_motor_2.getCurrentPosition();
-        } while (currPosition!=lastPosition);
+        } while (currPosition != lastPosition);
 
         eh_motor_2.setPower(0);
+    }
+
+    public enum WobbleLatchPosition {
+        OPEN, CLOSED
+    }
+
+    public void wobbleLatch(WobbleLatchPosition position) {
+        if (position == WobbleLatchPosition.OPEN) eh_servo_0.setPosition(0.25);
+        if (position == WobbleLatchPosition.CLOSED) eh_servo_0.setPosition(-0.25);
     }
 
     public void addTelemetry(){
         Telemetry telemetry = opMode.telemetry;
 
         orientation = getOrientation();
-
-        if (this.diagnosticMode){
-            telemetry.addLine("DIAGNOSTIC MODE!!!!!");
-        }
 
         telemetry.addData("Drive","%.2f Pow", opMode.gamepad2.left_stick_y);
         telemetry.addData("Turn","%.2f Pow", opMode.gamepad2.right_stick_x);
