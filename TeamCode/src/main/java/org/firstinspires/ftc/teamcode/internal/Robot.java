@@ -229,8 +229,18 @@ public class Robot {
         eh_motor_3.setPower(power3);
     }
 
-    public void wobbleArm() {
-        eh_motor_2.setPower(0.05);
+    public enum WobbleArmPosition{
+        UP(0.10), DOWN(-0.10);
+
+        public double power;
+
+        WobbleArmPosition(double power){
+            this.power = power;
+        }
+    }
+
+    public void wobbleArm(WobbleArmPosition position) {
+        eh_motor_2.setPower(position.power);
 
         int lastPosition = 0;
         int currPosition = 0;
