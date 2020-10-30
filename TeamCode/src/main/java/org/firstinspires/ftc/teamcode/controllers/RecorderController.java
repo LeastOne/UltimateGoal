@@ -50,10 +50,10 @@ public class RecorderController extends RobotController {
     public void execute() {
         switch(state) {
             case IDLE:
-                if (gamepad1.start && gamepad1.y ) enterRecording();
+                if (gamepad1.start && gamepad1.y) enterRecording();
                 if (gamepad1.y && !gamepad1.atRest()) enterReplaying();
-                if(gamepad1.x && !gamepad1.atRest()) enterReplaying();
-                if(gamepad1.b && !gamepad1.atRest()) enterReplaying();
+                if (gamepad1.x && !gamepad1.atRest()) enterReplaying();
+                if (gamepad1.b && !gamepad1.atRest()) enterReplaying();
                 if (gamepad1.x && gamepad1.dpad_left) blueFileName = selectRecording(blueFileName, RecordSelect.PREV);
                 if (gamepad1.x && gamepad1.dpad_right) blueFileName = selectRecording(blueFileName, RecordSelect.NEXT);
                 if (gamepad1.b && gamepad1.dpad_left) redFileName = selectRecording(redFileName, RecordSelect.PREV);
@@ -123,18 +123,6 @@ public class RecorderController extends RobotController {
 
     private String selectRecording(String filename, RecordSelect select) {
         return null;
-    }
-
-    private void selectNextRecordingBlueAlliance() {
-        //todo
-    }
-
-    private void selectPrevRecordingRedAlliance() {
-        //todo
-    }
-
-    private void selectNextRecordingRedAlliance() {
-        //todo
     }
 
     private void save() {
