@@ -64,7 +64,6 @@ public class Robot {
     private DcMotor eh_motor_2;
     private DcMotor eh_motor_3;
 
-
     private Servo eh_servo_0;
     private RevBlinkinLedDriver eh_servo_5;
 
@@ -209,7 +208,7 @@ public class Robot {
         ch_drive_rr.setPower(rr);
     }
 
-    public void setLights (RevBlinkinLedDriver.BlinkinPattern pattern) {
+    public void setLights(RevBlinkinLedDriver.BlinkinPattern pattern) {
         eh_servo_5.setPattern(pattern == BLACK ? DEFAULT_COLOR : pattern);
     }
 
@@ -229,12 +228,12 @@ public class Robot {
         eh_motor_3.setPower(power3);
     }
 
-    public enum WobbleArmPosition{
+    public enum WobbleArmPosition {
         UP(0.10), DOWN(-0.10);
 
         public double power;
 
-        WobbleArmPosition(double power){
+        WobbleArmPosition(double power) {
             this.power = power;
         }
     }
@@ -255,15 +254,20 @@ public class Robot {
     }
 
     public enum WobbleLatchPosition {
-        OPEN, CLOSED
+        OPEN(0.25), CLOSED(-0.25);
+
+        public double value;
+
+        WobbleLatchPosition(double value) {
+            this.value = value;
+        }
     }
 
     public void wobbleLatch(WobbleLatchPosition position) {
-        if (position == WobbleLatchPosition.OPEN) eh_servo_0.setPosition(0.25);
-        if (position == WobbleLatchPosition.CLOSED) eh_servo_0.setPosition(-0.25);
+        eh_servo_0.setPosition(position.value);
     }
 
-    public void addTelemetry(){
+    public void addTelemetry() {
         Telemetry telemetry = opMode.telemetry;
 
         orientation = getOrientation();
@@ -287,14 +291,14 @@ public class Robot {
             telemetry.addData("Recognitions", recognitions.size());
 
             for (Recognition recognition : recognitions) {
-                telemetry.addData(" label", recognition.getLabel());
-                telemetry.addData("  left,top", "%.3f , %.3f", recognition.getLeft(), recognition.getTop());
-                telemetry.addData("  right,bottom", "%.3f , %.3f", recognition.getRight(), recognition.getBottom());
-                telemetry.addData("  height,width", "%.3f , %.3f", recognition.getHeight(), recognition.getWidth());
-                telemetry.addData("  angle", "%.3f", recognition.estimateAngleToObject(DEGREES));
-                telemetry.addData("  offset", "%.3f", getOffset(recognition));
-                telemetry.addData("  heading", "%.3f", recognition.estimateAngleToObject(DEGREES) + getOffset(recognition));
-                telemetry.addData("  area", "%.3f", recognition.getWidth() * recognition.getHeight());
+                telemetry.addData(" Label", recognition.getLabel());
+                telemetry.addData("  Left,Top", "%.3f , %.3f", recognition.getLeft(), recognition.getTop());
+                telemetry.addData("  Right,Bottom", "%.3f , %.3f", recognition.getRight(), recognition.getBottom());
+                telemetry.addData("  Height,Width", "%.3f , %.3f", recognition.getHeight(), recognition.getWidth());
+                telemetry.addData("  Angle", "%.3f", recognition.estimateAngleToObject(DEGREES));
+                telemetry.addData("  Offset", "%.3f", getOffset(recognition));
+                telemetry.addData("  Heading", "%.3f", recognition.estimateAngleToObject(DEGREES) + getOffset(recognition));
+                telemetry.addData("  Area", "%.3f", recognition.getWidth() * recognition.getHeight());
             }
         }
 

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.controllers;
 
-import org.firstinspires.ftc.teamcode.internal.Robot;
 import org.firstinspires.ftc.teamcode.opmodes.OpMode;
 
 import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmPosition.DOWN;
@@ -9,7 +8,6 @@ import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleLatchPosition.
 import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleLatchPosition.OPEN;
 
 public class WobbleController extends RobotController {
-
     public WobbleController(OpMode opMode) {
         super(opMode);
     }
