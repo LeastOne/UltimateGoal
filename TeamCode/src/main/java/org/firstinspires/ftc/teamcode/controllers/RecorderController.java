@@ -14,12 +14,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecorderState.DISABLED;
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecorderState.IDLE;
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecorderState.RECORDING;
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecorderState.REPLAYING;
 
 public class RecorderController extends RobotController {
     public enum RecorderState{
+        DISABLED,
         IDLE,
         RECORDING,
         REPLAYING
@@ -34,11 +36,11 @@ public class RecorderController extends RobotController {
         NEXT
     }
 
-    private String currentFileName;
     private String redFileName;
+    private String currentFileName;
     private String blueFileName;
 
-    private RecorderState state = IDLE;
+    private RecorderState state = DISABLED;
 
     private List<Gamepad> gamepads = null;
 
@@ -48,12 +50,19 @@ public class RecorderController extends RobotController {
 
     @Override
     public void execute() {
+        //Start, Back, and not at rest to start recording mode
+        if(gamepad1.start && gamepad1.back && !gamepad1.atRest()) state =  IDLE;
+
+        if(state == DISABLED) return;
+
         switch(state) {
             case IDLE:
                 if (gamepad1.start && gamepad1.y) enterRecording();
                 if (gamepad1.y && !gamepad1.atRest()) enterReplaying();
                 if (gamepad1.x && !gamepad1.atRest()) enterReplaying();
                 if (gamepad1.b && !gamepad1.atRest()) enterReplaying();
+                if (gamepad1.y && gamepad1.dpad_left) currentFileName = selectRecording(currentFileName, RecordSelect.PREV);
+                if (gamepad1.y && gamepad1.dpad_right) currentFileName = selectRecording(currentFileName, RecordSelect.NEXT);
                 if (gamepad1.x && gamepad1.dpad_left) blueFileName = selectRecording(blueFileName, RecordSelect.PREV);
                 if (gamepad1.x && gamepad1.dpad_right) blueFileName = selectRecording(blueFileName, RecordSelect.NEXT);
                 if (gamepad1.b && gamepad1.dpad_left) redFileName = selectRecording(redFileName, RecordSelect.PREV);
