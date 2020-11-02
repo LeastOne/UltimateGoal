@@ -15,6 +15,8 @@ import java.util.Date;
 import java.util.List;
 
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecorderState.DISABLED;
+import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecordSelect.NEXT;
+import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecordSelect.PREV;
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecorderState.IDLE;
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecorderState.RECORDING;
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecorderState.REPLAYING;
@@ -32,8 +34,12 @@ public class RecorderController extends RobotController {
     }
 
     public enum RecordSelect{
-        PREV,
-        NEXT
+        PREV(-1),
+        NEXT(1);
+        public int value;
+        RecordSelect(int value){
+            this.value = value;
+        }
     }
 
     private String redFileName;
@@ -61,12 +67,12 @@ public class RecorderController extends RobotController {
                 if (gamepad1.y && !gamepad1.atRest()) enterReplaying();
                 if (gamepad1.x && !gamepad1.atRest()) enterReplaying();
                 if (gamepad1.b && !gamepad1.atRest()) enterReplaying();
-                if (gamepad1.y && gamepad1.dpad_left) currentFileName = selectRecording(currentFileName, RecordSelect.PREV);
-                if (gamepad1.y && gamepad1.dpad_right) currentFileName = selectRecording(currentFileName, RecordSelect.NEXT);
-                if (gamepad1.x && gamepad1.dpad_left) blueFileName = selectRecording(blueFileName, RecordSelect.PREV);
-                if (gamepad1.x && gamepad1.dpad_right) blueFileName = selectRecording(blueFileName, RecordSelect.NEXT);
-                if (gamepad1.b && gamepad1.dpad_left) redFileName = selectRecording(redFileName, RecordSelect.PREV);
-                if (gamepad1.b && gamepad1.dpad_right) redFileName = selectRecording(redFileName, RecordSelect.NEXT);
+                if (gamepad1.y && gamepad1.dpad_left) currentFileName = selectRecording(currentFileName, PREV);
+                if (gamepad1.y && gamepad1.dpad_right) currentFileName = selectRecording(currentFileName, NEXT);
+                if (gamepad1.x && gamepad1.dpad_left) blueFileName = selectRecording(blueFileName, PREV);
+                if (gamepad1.x && gamepad1.dpad_right) blueFileName = selectRecording(blueFileName, NEXT);
+                if (gamepad1.b && gamepad1.dpad_left) redFileName = selectRecording(redFileName, PREV);
+                if (gamepad1.b && gamepad1.dpad_right) redFileName = selectRecording(redFileName, NEXT);
                 break;
             case RECORDING:
                 if (gamepad1.back) enterIdle();
@@ -124,20 +130,20 @@ public class RecorderController extends RobotController {
     }
 
     private void enterReplaying() {
-        //File directory = new File("./");
-        //File[] files = directory.listFiles();
         state = REPLAYING;
         load();
     }
 
     private String selectRecording(String filename, RecordSelect select) {
-        // 1. Get a list of all the recording filenames
-        // 2. For each recording filename
-        //    a. Add one to the current index
-        //    b. If current recording filename equals the provided filename, break
-        //    c. Else, continue the loop
-        // 3. If select is NEXT, return file at index + 1, only if not at max, else return the given filename
-        // 4. If select is PREV, return file at index - 1, only if not at min, else return the given filename
+        File directory = AppUtil.getInstance().getSettingsFile("recordings/");
+        File[] files = directory.listFiles();
+        int index = 0;
+        for(;index<files.length;index++){
+            if(files[index].getName().equals(filename))break;
+        }
+        index+=select.value;
+        if(0<=index&&index<files.length)return files[index].getName();
+        return files[index].getName();
     }
 
     private void save() {
