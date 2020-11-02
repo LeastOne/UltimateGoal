@@ -122,7 +122,13 @@ public class RecorderController extends RobotController {
     }
 
     private String selectRecording(String filename, RecordSelect select) {
-        return null;
+        // 1. Get a list of all the recording filenames
+        // 2. For each recording filename
+        //    a. Add one to the current index
+        //    b. If current recording filename equals the provided filename, break
+        //    c. Else, continue the loop
+        // 3. If select is NEXT, return file at index + 1, only if not at max, else return the given filename
+        // 4. If select is PREV, return file at index - 1, only if not at min, else return the given filename
     }
 
     private void save() {
