@@ -6,7 +6,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public class Red1OpMode extends RedOpMode {
     @Override
     protected void execute() {
-        gamepad1.a = true;
+        gamepad1.back = true;
+        gamepad1.start = true;
+        gamepad1.left_trigger = 1;
+        gamepad1.y = true;
         super.execute();
     }
 }
