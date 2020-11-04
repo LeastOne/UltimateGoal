@@ -90,6 +90,9 @@ public class RecorderController extends RobotController {
 
         telemetry.addData("Recording State", state);
         telemetry.addData("Gamepad States",gamepads == null ? 0 : gamepads.size());
+        telemetry.addData("current recording",settings.currentFileName);
+        telemetry.addData("blue recording",settings.blueFileName);
+        telemetry.addData("red recording",settings.redFileName);
         telemetry.addLine();
     }
 
