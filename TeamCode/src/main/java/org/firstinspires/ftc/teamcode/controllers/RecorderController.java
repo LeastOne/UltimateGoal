@@ -53,6 +53,7 @@ public class RecorderController extends RobotController {
 
     public RecorderController(OpMode opMode) {
         super(opMode);
+        loadSettings();
     }
 
     @Override
@@ -65,15 +66,15 @@ public class RecorderController extends RobotController {
         switch(state) {
             case IDLE:
                 if (gamepad1.start && gamepad1.y) enterRecording();
-                if (gamepad1.y && !gamepad1.atRest()) enterReplaying();
-                if (gamepad1.x && !gamepad1.atRest()) enterReplaying();
-                if (gamepad1.b && !gamepad1.atRest()) enterReplaying();
-                if (gamepad1.y && gamepad1.dpad_left) currentFileName = selectRecording(currentFileName, PREV);
-                if (gamepad1.y && gamepad1.dpad_right) currentFileName = selectRecording(currentFileName, NEXT);
-                if (gamepad1.x && gamepad1.dpad_left) blueFileName = selectRecording(blueFileName, PREV);
-                if (gamepad1.x && gamepad1.dpad_right) blueFileName = selectRecording(blueFileName, NEXT);
-                if (gamepad1.b && gamepad1.dpad_left) redFileName = selectRecording(redFileName, PREV);
-                if (gamepad1.b && gamepad1.dpad_right) redFileName = selectRecording(redFileName, NEXT);
+                if (gamepad1.y && !gamepad1.atRest()) enterReplaying(settings.currentFileName);
+                if (gamepad1.x && !gamepad1.atRest()) enterReplaying(settings.blueFileName);
+                if (gamepad1.b && !gamepad1.atRest()) enterReplaying(settings.redFileName);
+                if (gamepad1.y && gamepad1.dpad_left) settings.currentFileName = selectRecording(settings.currentFileName, PREV);
+                if (gamepad1.y && gamepad1.dpad_right) settings.currentFileName = selectRecording(settings.currentFileName, NEXT);
+                if (gamepad1.x && gamepad1.dpad_left) settings.blueFileName = selectRecording(settings.blueFileName, PREV);
+                if (gamepad1.x && gamepad1.dpad_right) settings.blueFileName = selectRecording(settings.blueFileName, NEXT);
+                if (gamepad1.b && gamepad1.dpad_left) settings.redFileName = selectRecording(settings.redFileName, PREV);
+                if (gamepad1.b && gamepad1.dpad_right) settings.redFileName = selectRecording(settings.redFileName, NEXT);
                 if (gamepad1.dpad_right || gamepad1.dpad_left) saveSettings();
                 break;
             case RECORDING:
@@ -128,12 +129,12 @@ public class RecorderController extends RobotController {
         gamepads = new ArrayList<>();
         state = RECORDING;
         SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd--hh-mm-ss");
-        currentFileName = "recordings/" + sim.format(new Date()) + ".json";
+        settings.currentFileName = "recordings/" + sim.format(new Date()) + ".json";
     }
 
-    private void enterReplaying() {
+    private void enterReplaying( String fileName) {
         state = REPLAYING;
-        loadRecording();
+        loadRecording(fileName);
     }
 
     private String selectRecording(String filename, RecordSelect select) {
@@ -165,13 +166,13 @@ public class RecorderController extends RobotController {
     }
     private void saveRecording() {
         String json = SimpleGson.getInstance().toJson(gamepads.toArray());
-        File file = AppUtil.getInstance().getSettingsFile(currentFileName);
+        File file = AppUtil.getInstance().getSettingsFile(settings.currentFileName);
         ReadWriteFile.writeFile(file,json);
     }
 
-    private void loadRecording() {
+    private void loadRecording(String fileName ) {
         try {
-            File file = AppUtil.getInstance().getSettingsFile(currentFileName);
+            File file = AppUtil.getInstance().getSettingsFile(fileName);
             String json = ReadWriteFile.readFileOrThrow(file);
             gamepads = SimpleGson.getInstance().fromJson(json, new TypeToken<List<Gamepad>>(){}.getType());
         } catch(Exception e) {
