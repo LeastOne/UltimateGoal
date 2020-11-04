@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.internal.collections.SimpleGson;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.opmodes.OpMode;
 
 import java.io.File;
@@ -30,7 +31,9 @@ public class RecorderController extends RobotController {
     }
 
     public class RecorderSettings {
-
+        public String redFileName;
+        public String currentFileName;
+        public String blueFileName;
     }
 
     public enum RecordSelect{
@@ -42,9 +45,7 @@ public class RecorderController extends RobotController {
         }
     }
 
-    private String redFileName;
-    private String currentFileName;
-    private String blueFileName;
+    private RecorderSettings settings = new RecorderSettings();
 
     private RecorderState state = DISABLED;
 
@@ -73,6 +74,7 @@ public class RecorderController extends RobotController {
                 if (gamepad1.x && gamepad1.dpad_right) blueFileName = selectRecording(blueFileName, NEXT);
                 if (gamepad1.b && gamepad1.dpad_left) redFileName = selectRecording(redFileName, PREV);
                 if (gamepad1.b && gamepad1.dpad_right) redFileName = selectRecording(redFileName, NEXT);
+                if (gamepad1.dpad_right || gamepad1.dpad_left) saveSettings();
                 break;
             case RECORDING:
                 if (gamepad1.back) enterIdle();
@@ -118,7 +120,7 @@ public class RecorderController extends RobotController {
     }
 
     private void enterIdle() {
-        if (state == RECORDING) save();
+        if (state == RECORDING) saveRecording();
         state = IDLE;
     }
 
@@ -131,7 +133,7 @@ public class RecorderController extends RobotController {
 
     private void enterReplaying() {
         state = REPLAYING;
-        load();
+        loadRecording();
     }
 
     private String selectRecording(String filename, RecordSelect select) {
@@ -146,19 +148,34 @@ public class RecorderController extends RobotController {
         return files[index].getName();
     }
 
-    private void save() {
+    private void saveSettings() {
+        String json = SimpleGson.getInstance().toJson(settings);
+        File file = AppUtil.getInstance().getSettingsFile("recordings/settings.json");
+        ReadWriteFile.writeFile(file,json);
+    }
+
+    private void loadSettings() {
+        try {
+            File file = AppUtil.getInstance().getSettingsFile("recordings/settings.json");
+            String json = ReadWriteFile.readFileOrThrow(file);
+            settings = SimpleGson.getInstance().fromJson(json, new TypeToken<RecorderSettings>() {}.getType());
+        } catch (Exception e) {
+            telemetry.addData("Error", "An error occurred attempting to load the settings" + e.toString());
+        }
+    }
+    private void saveRecording() {
         String json = SimpleGson.getInstance().toJson(gamepads.toArray());
         File file = AppUtil.getInstance().getSettingsFile(currentFileName);
         ReadWriteFile.writeFile(file,json);
     }
 
-    private void load() {
+    private void loadRecording() {
         try {
             File file = AppUtil.getInstance().getSettingsFile(currentFileName);
             String json = ReadWriteFile.readFileOrThrow(file);
             gamepads = SimpleGson.getInstance().fromJson(json, new TypeToken<List<Gamepad>>(){}.getType());
         } catch(Exception e) {
-            telemetry.addData("Error","An error occurred attempting to load the playback data" + e.toString());
+            telemetry.addData("Error","An error occurred attempting to load the recording data" + e.toString());
         }
     }
 }
