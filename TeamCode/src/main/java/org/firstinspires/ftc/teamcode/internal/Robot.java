@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.internal;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -67,6 +68,10 @@ public class Robot {
     private Servo eh_servo_0;
     private RevBlinkinLedDriver eh_servo_5;
 
+    private DigitalChannel eh_digital_0_1;
+
+    private DigitalChannel eh_digital_2_3;
+
     private VisionThread visionThread;
 
     public WebcamName webcamName;
@@ -124,28 +129,33 @@ public class Robot {
         ch_drive_rr.setMode(RUN_USING_ENCODER);
         ch_drive_rr.setDirection(REVERSE);
 
- //        eh_motor_0 = hardwareMap.get(DcMotor.class, "eh_motor_0");
-//        eh_motor_0.setMode(STOP_AND_RESET_ENCODER);
-//        eh_motor_0.setMode(RUN_USING_ENCODER);
-//        eh_motor_0.setDirection(FORWARD);
-//
-//        eh_motor_1 = hardwareMap.get(DcMotor.class, "eh_motor_1");
-//        eh_motor_1.setMode(STOP_AND_RESET_ENCODER);
-//        eh_motor_1.setMode(RUN_USING_ENCODER);
-//        eh_motor_1.setDirection(FORWARD);
-//
-//        eh_motor_2 = hardwareMap.get(DcMotor.class, "eh_motor_2");
-//        eh_motor_2.setMode(STOP_AND_RESET_ENCODER);
-//        eh_motor_2.setMode(RUN_USING_ENCODER);
-//        eh_motor_2.setDirection(FORWARD);
-//
-//        eh_motor_3 = hardwareMap.get(DcMotor.class, "eh_motor_3");
-//        eh_motor_3.setMode(STOP_AND_RESET_ENCODER);
-//        eh_motor_3.setMode(RUN_USING_ENCODER);
-//        eh_motor_3.setDirection(FORWARD);
+         eh_motor_0 = hardwareMap.get(DcMotor.class, "eh_motor_0");
+        eh_motor_0.setMode(STOP_AND_RESET_ENCODER);
+        eh_motor_0.setMode(RUN_USING_ENCODER);
+        eh_motor_0.setDirection(FORWARD);
+
+        eh_motor_1 = hardwareMap.get(DcMotor.class, "eh_motor_1");
+        eh_motor_1.setMode(STOP_AND_RESET_ENCODER);
+        eh_motor_1.setMode(RUN_USING_ENCODER);
+        eh_motor_1.setDirection(FORWARD);
+
+        eh_motor_2 = hardwareMap.get(DcMotor.class, "eh_motor_2");
+        eh_motor_2.setMode(STOP_AND_RESET_ENCODER);
+        eh_motor_2.setMode(RUN_USING_ENCODER);
+        eh_motor_2.setDirection(FORWARD);
+
+        eh_motor_3 = hardwareMap.get(DcMotor.class, "eh_motor_3");
+        eh_motor_3.setMode(STOP_AND_RESET_ENCODER);
+        eh_motor_3.setMode(RUN_USING_ENCODER);
+        eh_motor_3.setDirection(FORWARD);
 
         eh_servo_0 = hardwareMap.get(Servo.class,"eh_servo_0");
         eh_servo_5 = hardwareMap.get(RevBlinkinLedDriver.class,"eh_servo_5");
+
+        eh_digital_0_1 = hardwareMap.get(DigitalChannel.class, "eh_digital_0_1");
+
+        eh_digital_2_3 = hardwareMap.get(DigitalChannel.class, "eh_digital_2_3");
+
 
         try {
             webcamName = hardwareMap.get(WebcamName.class,"Webcam 1");
