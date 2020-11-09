@@ -249,18 +249,12 @@ public class Robot {
     }
 
     public void wobbleArm(WobbleArmPosition position) {
-        eh_motor_2.setPower(position.power);
-
-        int lastPosition = 0;
-        int currPosition = 0;
-
-        do {
-            opMode.sleep(50);
-            lastPosition = currPosition;
-            currPosition = eh_motor_2.getCurrentPosition();
-        } while (currPosition != lastPosition);
-
-        eh_motor_2.setPower(0);
+        if ((position == WobbleArmPosition.UP && eh_digital_0_1.getState()) ||
+                (position == WobbleArmPosition.DOWN && eh_digital_2_3.getState())) {
+            eh_motor_2.setPower(0);
+        } else {
+            eh_motor_2.setPower(position.power);
+        }
     }
 
     public enum WobbleLatchPosition {
