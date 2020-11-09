@@ -69,7 +69,6 @@ public class Robot {
     private RevBlinkinLedDriver eh_servo_5;
 
     private DigitalChannel eh_digital_0_1;
-
     private DigitalChannel eh_digital_2_3;
 
     private VisionThread visionThread;
@@ -129,7 +128,7 @@ public class Robot {
         ch_drive_rr.setMode(RUN_USING_ENCODER);
         ch_drive_rr.setDirection(REVERSE);
 
-         eh_motor_0 = hardwareMap.get(DcMotor.class, "eh_motor_0");
+        eh_motor_0 = hardwareMap.get(DcMotor.class, "eh_motor_0");
         eh_motor_0.setMode(STOP_AND_RESET_ENCODER);
         eh_motor_0.setMode(RUN_USING_ENCODER);
         eh_motor_0.setDirection(FORWARD);
@@ -153,9 +152,7 @@ public class Robot {
         eh_servo_5 = hardwareMap.get(RevBlinkinLedDriver.class,"eh_servo_5");
 
         eh_digital_0_1 = hardwareMap.get(DigitalChannel.class, "eh_digital_0_1");
-
         eh_digital_2_3 = hardwareMap.get(DigitalChannel.class, "eh_digital_2_3");
-
 
         try {
             webcamName = hardwareMap.get(WebcamName.class,"Webcam 1");
@@ -191,7 +188,7 @@ public class Robot {
     }
 
     public void drive(double power, double turn) {
-        if (!opMode.isContinuing()) return;
+        if (opMode.isStopping()) return;
 
         double left = power + turn;
         double right = power - turn;
@@ -210,7 +207,7 @@ public class Robot {
     }
 
     public void drive(double lf, double lr, double rf, double rr) {
-        if (!opMode.isContinuing()) return;
+        if (opMode.isStopping()) return;
 
         ch_drive_lf.setPower(lf);
         ch_drive_lr.setPower(lr);

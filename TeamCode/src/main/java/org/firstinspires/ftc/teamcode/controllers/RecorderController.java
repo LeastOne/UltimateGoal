@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.internal.collections.SimpleGson;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.opmodes.OpMode;
 
 import java.io.File;
@@ -14,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecorderState.DISABLED;
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecordSelect.NEXT;
@@ -30,7 +30,7 @@ public class RecorderController extends RobotController {
         REPLAYING
     }
 
-    public class RecorderSettings {
+    public static class RecorderSettings {
         public String redFileName;
         public String currentFileName;
         public String blueFileName;
@@ -44,6 +44,8 @@ public class RecorderController extends RobotController {
             this.value = value;
         }
     }
+
+    private static String RecordingPath = "recordings/";
 
     private RecorderSettings settings = new RecorderSettings();
 
@@ -89,10 +91,10 @@ public class RecorderController extends RobotController {
         }
 
         telemetry.addData("Recording State", state);
-        telemetry.addData("Gamepad States",gamepads == null ? 0 : gamepads.size());
-        telemetry.addData("current recording",settings.currentFileName);
-        telemetry.addData("blue recording",settings.blueFileName);
-        telemetry.addData("red recording",settings.redFileName);
+        telemetry.addData("Gamepad States", gamepads == null ? 0 : gamepads.size());
+        telemetry.addData("Current Recording", settings.currentFileName);
+        telemetry.addData("Blue Recording", settings.blueFileName);
+        telemetry.addData("Red Recording", settings.redFileName);
         telemetry.addLine();
     }
 
@@ -131,8 +133,8 @@ public class RecorderController extends RobotController {
     private void enterRecording() {
         gamepads = new ArrayList<>();
         state = RECORDING;
-        SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd--hh-mm-ss");
-        settings.currentFileName = "recordings/" + sim.format(new Date()) + ".json";
+        SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd--hh-mm-ss", Locale.US);
+        settings.currentFileName = RecordingPath + sim.format(new Date()) + ".json";
     }
 
     private void enterReplaying( String fileName) {
@@ -141,26 +143,29 @@ public class RecorderController extends RobotController {
     }
 
     private String selectRecording(String filename, RecordSelect select) {
-        File directory = AppUtil.getInstance().getSettingsFile("recordings/");
+        File directory = AppUtil.getInstance().getSettingsFile(RecordingPath);
         File[] files = directory.listFiles();
+
         int index = 0;
-        for(;index<files.length;index++){
-            if(files[index].getName().equals(filename))break;
-        }
-        index+=select.value;
-        if(0<=index&&index<files.length)return files[index].getName();
+        for (; index < files.length; index++)
+            if (files[index].getName().equals(filename))
+                break;
+
+        if(index > 0 && index < files.length - 1)
+            index += select.value;
+
         return files[index].getName();
     }
 
     private void saveSettings() {
         String json = SimpleGson.getInstance().toJson(settings);
-        File file = AppUtil.getInstance().getSettingsFile("recordings/settings.json");
+        File file = AppUtil.getInstance().getSettingsFile(RecordingPath + "settings.json");
         ReadWriteFile.writeFile(file,json);
     }
 
     private void loadSettings() {
         try {
-            File file = AppUtil.getInstance().getSettingsFile("recordings/settings.json");
+            File file = AppUtil.getInstance().getSettingsFile(RecordingPath + "settings.json");
             String json = ReadWriteFile.readFileOrThrow(file);
             settings = SimpleGson.getInstance().fromJson(json, new TypeToken<RecorderSettings>() {}.getType());
         } catch (Exception e) {

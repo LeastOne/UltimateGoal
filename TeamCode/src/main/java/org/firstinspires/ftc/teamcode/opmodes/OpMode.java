@@ -24,7 +24,7 @@ public abstract class OpMode extends LinearOpMode {
     }
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         robot = new Robot(this);
         robot.init(getAlliance());
         if (calibrate) robot.calibrate();
@@ -40,7 +40,7 @@ public abstract class OpMode extends LinearOpMode {
         return opModeIsActive();
     }
 
-    public boolean isContinuing() {
+    public boolean isStopping() {
         yield();
         return !isStopRequested() && !gamepad1.back && !gamepad2.back;
     }
