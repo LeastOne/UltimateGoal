@@ -249,8 +249,8 @@ public class Robot {
     }
 
     public void wobbleArm(WobbleArmPosition position) {
-        if ((position == WobbleArmPosition.UP && eh_digital_0_1.getState()) ||
-                (position == WobbleArmPosition.DOWN && eh_digital_2_3.getState())) {
+        if ((position == WobbleArmPosition.UP && !eh_digital_0_1.getState()) ||
+            (position == WobbleArmPosition.DOWN && !eh_digital_2_3.getState())) {
             eh_motor_2.setPower(0);
         } else {
             eh_motor_2.setPower(position.power);
@@ -282,6 +282,8 @@ public class Robot {
         telemetry.addData("Drive (LR)","%.2f Pow, %d Pos", ch_drive_lr.getPower(), ch_drive_lr.getCurrentPosition());
         telemetry.addData("Drive (RF)","%.2f Pow, %d Pos", ch_drive_rf.getPower(), ch_drive_rf.getCurrentPosition());
         telemetry.addData("Drive (RR)","%.2f Pow, %d Pos", ch_drive_rr.getPower(), ch_drive_rr.getCurrentPosition());
+        telemetry.addData("Wobble Limit", eh_digital_0_1.getState());
+        telemetry.addData("Wobble Touch", eh_digital_2_3.getState());
         telemetry.addData("Target Visible", navigationTargetVisible);
         telemetry.addData("Position (in)", position);
         telemetry.addData("Orientation", orientation);
