@@ -44,9 +44,9 @@ public class VisionThread extends Thread {
     private OpenGLMatrix lastLocation = null;
     private VuforiaLocalizer vuforia = null;
 
-    private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
-    private static final String LABEL_FIRST_ELEMENT = "Stone";
-    private static final String LABEL_SECOND_ELEMENT = "Skystone";
+    private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
+    private static final String LABEL_FIRST_ELEMENT = "Quad";
+    private static final String LABEL_SECOND_ELEMENT = "Single";
 
     private OpMode opMode;
     private Robot robot;
@@ -66,93 +66,42 @@ public class VisionThread extends Thread {
 
             vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
-            VuforiaTrackables targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
+            VuforiaTrackables targetsUltimateGoal = this.vuforia.loadTrackablesFromAsset("UltimateGoal");
+            VuforiaTrackable blueTowerGoalTarget = targetsUltimateGoal.get(0);
+            blueTowerGoalTarget.setName("Blue Tower Goal Target");
+            VuforiaTrackable redTowerGoalTarget = targetsUltimateGoal.get(1);
+            redTowerGoalTarget.setName("Red Tower Goal Target");
+            VuforiaTrackable redAllianceTarget = targetsUltimateGoal.get(2);
+            redAllianceTarget.setName("Red Alliance Target");
+            VuforiaTrackable blueAllianceTarget = targetsUltimateGoal.get(3);
+            blueAllianceTarget.setName("Blue Alliance Target");
+            VuforiaTrackable frontWallTarget = targetsUltimateGoal.get(4);
+            frontWallTarget.setName("Front Wall Target");
 
-            VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
-            stoneTarget.setName("Stone Target");
-            VuforiaTrackable blueRearBridge = targetsSkyStone.get(1);
-            blueRearBridge.setName("Blue Rear Bridge");
-            VuforiaTrackable redRearBridge = targetsSkyStone.get(2);
-            redRearBridge.setName("Red Rear Bridge");
-            VuforiaTrackable redFrontBridge = targetsSkyStone.get(3);
-            redFrontBridge.setName("Red Front Bridge");
-            VuforiaTrackable blueFrontBridge = targetsSkyStone.get(4);
-            blueFrontBridge.setName("Blue Front Bridge");
-            VuforiaTrackable red1 = targetsSkyStone.get(5);
-            red1.setName("Red Perimeter 1");
-            VuforiaTrackable red2 = targetsSkyStone.get(6);
-            red2.setName("Red Perimeter 2");
-            VuforiaTrackable front1 = targetsSkyStone.get(7);
-            front1.setName("Front Perimeter 1");
-            VuforiaTrackable front2 = targetsSkyStone.get(8);
-            front2.setName("Front Perimeter 2");
-            VuforiaTrackable blue1 = targetsSkyStone.get(9);
-            blue1.setName("Blue Perimeter 1");
-            VuforiaTrackable blue2 = targetsSkyStone.get(10);
-            blue2.setName("Blue Perimeter 2");
-            VuforiaTrackable rear1 = targetsSkyStone.get(11);
-            rear1.setName("Rear Perimeter 1");
-            VuforiaTrackable rear2 = targetsSkyStone.get(12);
-            rear2.setName("Rear Perimeter 2");
 
             // For convenience, gather together all the trackable objects in one easily-iterable collection */
             List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
-            allTrackables.addAll(targetsSkyStone);
+            allTrackables.addAll(targetsUltimateGoal);
 
             // Set the position of the Stone Target.  Since it's not fixed in position, assume it's at the field origin.
             // Rotated it to to face forward, and raised it to sit on the ground correctly.
             // This can be used for generic target-centric approach algorithms
-            stoneTarget.setLocation(OpenGLMatrix
-                    .translation(0, 0, stoneZ)
-                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
-
-            //Set the position of the bridge support targets with relation to origin (center of field)
-            blueFrontBridge.setLocation(OpenGLMatrix
-                    .translation(-bridgeX, bridgeY, bridgeZ)
-                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 0, bridgeRotY, bridgeRotZ)));
-
-            blueRearBridge.setLocation(OpenGLMatrix
-                    .translation(-bridgeX, bridgeY, bridgeZ)
-                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 0, -bridgeRotY, bridgeRotZ)));
-
-            redFrontBridge.setLocation(OpenGLMatrix
-                    .translation(-bridgeX, -bridgeY, bridgeZ)
-                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 0, -bridgeRotY, 0)));
-
-            redRearBridge.setLocation(OpenGLMatrix
-                    .translation(bridgeX, -bridgeY, bridgeZ)
-                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 0, bridgeRotY, 0)));
-
-            //Set the position of the perimeter targets with relation to origin (center of field)
-            red1.setLocation(OpenGLMatrix
-                    .translation(quadField, -halfField, mmTargetHeight)
+            redAllianceTarget.setLocation(OpenGLMatrix
+                    .translation(0, -halfField, mmTargetHeight)
                     .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 180)));
 
-            red2.setLocation(OpenGLMatrix
-                    .translation(-quadField, -halfField, mmTargetHeight)
-                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 180)));
-
-            front1.setLocation(OpenGLMatrix
-                    .translation(-halfField, -quadField, mmTargetHeight)
+            blueAllianceTarget.setLocation(OpenGLMatrix
+                    .translation(0, halfField, mmTargetHeight)
+                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 0)));
+            frontWallTarget.setLocation(OpenGLMatrix
+                    .translation(-halfField, 0, mmTargetHeight)
                     .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0 , 90)));
 
-            front2.setLocation(OpenGLMatrix
-                    .translation(-halfField, quadField, mmTargetHeight)
-                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 90)));
-
-            blue1.setLocation(OpenGLMatrix
-                    .translation(-quadField, halfField, mmTargetHeight)
-                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 0)));
-
-            blue2.setLocation(OpenGLMatrix
-                    .translation(quadField, halfField, mmTargetHeight)
-                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 0)));
-
-            rear1.setLocation(OpenGLMatrix
+            // The tower goal targets are located a quarter field length from the ends of the back perimeter wall.
+            blueTowerGoalTarget.setLocation(OpenGLMatrix
                     .translation(halfField, quadField, mmTargetHeight)
                     .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0 , -90)));
-
-            rear2.setLocation(OpenGLMatrix
+            redTowerGoalTarget.setLocation(OpenGLMatrix
                     .translation(halfField, -quadField, mmTargetHeight)
                     .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
 
@@ -170,10 +119,10 @@ public class VisionThread extends Thread {
                 ((VuforiaTrackableDefaultListener) trackable.getListener()).setCameraLocationOnRobot(robot.webcamName, robotFromCamera);
             }
 
-            targetsSkyStone.activate();
+            targetsUltimateGoal.activate();
 
             TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(robot.tfodMonitorViewId);
-            tfodParameters.minimumConfidence = 0.70;
+            tfodParameters.minResultConfidence = 0.8f;
             tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
             tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
             tfod.activate();
@@ -183,7 +132,6 @@ public class VisionThread extends Thread {
             while (opMode.isActive()) {
                 // check all the trackable targets to see which one (if any) is visible.
                 boolean targetVisible = false;
-                boolean skystoneVisible = false;
 
                 for (VuforiaTrackable trackable : allTrackables) {
                     if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
@@ -208,7 +156,6 @@ public class VisionThread extends Thread {
                                 robot.position = position;
                                 robot.orientation = orientation;
                             } else {
-                                skystoneVisible = true;
                                 robot.itemPosition = position;
                                 robot.itemOrientation = orientation;
                             }
@@ -217,7 +164,6 @@ public class VisionThread extends Thread {
                 }
 
                 robot.navigationTargetVisible = targetVisible;
-                robot.itemVisible = skystoneVisible;
 
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
@@ -226,7 +172,7 @@ public class VisionThread extends Thread {
                 }
             }
 
-            targetsSkyStone.deactivate();
+            targetsUltimateGoal.deactivate();
         } catch (Exception e) {
             robot.error = e.toString();
         }
