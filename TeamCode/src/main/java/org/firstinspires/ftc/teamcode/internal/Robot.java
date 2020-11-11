@@ -236,7 +236,7 @@ public class Robot {
     }
 
     public enum WobbleArmPosition {
-        UP(0.10), DOWN(-0.10);
+        UP(0.10), DOWN(-0.10), STOP(0);
 
         public double power;
 
