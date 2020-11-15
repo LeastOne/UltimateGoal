@@ -42,7 +42,7 @@ public abstract class OpMode extends LinearOpMode {
 
     public boolean isStopping() {
         yield();
-        return !isStopRequested() && !gamepad1.back && !gamepad2.back;
+        return isStopRequested() || gamepad1.back || gamepad2.back;
     }
 
     protected Alliance getAlliance() {

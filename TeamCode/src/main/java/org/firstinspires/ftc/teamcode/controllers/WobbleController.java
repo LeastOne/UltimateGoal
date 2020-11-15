@@ -19,6 +19,6 @@ public class WobbleController extends RobotController {
         else if (gamepad2.right_bumper) robot.wobbleArm(UP);
         else robot.wobbleArm(STOP);
         if (gamepad2.dpad_left) robot.wobbleLatch(CLOSED);
-        if (gamepad2.dpad_right) robot.wobbleLatch(OPEN);
+        else if (gamepad2.dpad_right) robot.wobbleLatch(OPEN);
     }
 }

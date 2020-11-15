@@ -37,6 +37,8 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.INTRINSIC;
+import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmPosition.DOWN;
+import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmPosition.UP;
 
 public class Robot {
     private static final double INCHES_PER_ROTATION = 3.95 * Math.PI;
@@ -111,22 +113,22 @@ public class Robot {
         ch_drive_lf = hardwareMap.get(DcMotor.class, "ch_drive_lf");
         ch_drive_lf.setMode(STOP_AND_RESET_ENCODER);
         ch_drive_lf.setMode(RUN_USING_ENCODER);
-        ch_drive_lf.setDirection(FORWARD);
+        ch_drive_lf.setDirection(REVERSE);
 
         ch_drive_rf = hardwareMap.get(DcMotor.class,"ch_drive_rf");
         ch_drive_rf.setMode(STOP_AND_RESET_ENCODER);
         ch_drive_rf.setMode(RUN_USING_ENCODER);
-        ch_drive_rf.setDirection(REVERSE);
+        ch_drive_rf.setDirection(FORWARD);
 
         ch_drive_lr = hardwareMap.get(DcMotor.class,"ch_drive_lr");
         ch_drive_lr.setMode(STOP_AND_RESET_ENCODER);
         ch_drive_lr.setMode(RUN_USING_ENCODER);
-        ch_drive_lr.setDirection(FORWARD);
+        ch_drive_lr.setDirection(REVERSE);
 
         ch_drive_rr = hardwareMap.get(DcMotor.class, "ch_drive_rr");
         ch_drive_rr.setMode(STOP_AND_RESET_ENCODER);
         ch_drive_rr.setMode(RUN_USING_ENCODER);
-        ch_drive_rr.setDirection(REVERSE);
+        ch_drive_rr.setDirection(FORWARD);
 
         eh_motor_0 = hardwareMap.get(DcMotor.class, "eh_motor_0");
         eh_motor_0.setMode(STOP_AND_RESET_ENCODER);
@@ -246,8 +248,8 @@ public class Robot {
     }
 
     public void wobbleArm(WobbleArmPosition position) {
-        if ((position == WobbleArmPosition.UP && !eh_digital_0_1.getState()) ||
-            (position == WobbleArmPosition.DOWN && !eh_digital_2_3.getState())) {
+        if ((position == UP && !eh_digital_0_1.getState()) ||
+            (position == DOWN && !eh_digital_2_3.getState())) {
             eh_motor_2.setPower(0);
         } else {
             eh_motor_2.setPower(position.power);
@@ -255,7 +257,7 @@ public class Robot {
     }
 
     public enum WobbleLatchPosition {
-        OPEN(0.25), CLOSED(-0.25);
+        OPEN(0.3), CLOSED(0.22);
 
         public double value;
 
@@ -273,14 +275,16 @@ public class Robot {
 
         orientation = getOrientation();
 
-        telemetry.addData("Drive","%.2f Pow", opMode.gamepad2.left_stick_y);
-        telemetry.addData("Turn","%.2f Pow", opMode.gamepad2.right_stick_x);
-        telemetry.addData("Drive (LF)","%.2f Pow, %d Pos", ch_drive_lf.getPower(), ch_drive_lf.getCurrentPosition());
-        telemetry.addData("Drive (LR)","%.2f Pow, %d Pos", ch_drive_lr.getPower(), ch_drive_lr.getCurrentPosition());
-        telemetry.addData("Drive (RF)","%.2f Pow, %d Pos", ch_drive_rf.getPower(), ch_drive_rf.getCurrentPosition());
-        telemetry.addData("Drive (RR)","%.2f Pow, %d Pos", ch_drive_rr.getPower(), ch_drive_rr.getCurrentPosition());
-        telemetry.addData("Wobble Limit", eh_digital_0_1.getState());
-        telemetry.addData("Wobble Touch", eh_digital_2_3.getState());
+        telemetry.addData("Drive", "%.2f Pow", opMode.gamepad2.left_stick_y);
+        telemetry.addData("Turn", "%.2f Pow", opMode.gamepad2.right_stick_x);
+        telemetry.addData("Drive (LF)", "%.2f Pow, %d Pos", ch_drive_lf.getPower(), ch_drive_lf.getCurrentPosition());
+        telemetry.addData("Drive (LR)", "%.2f Pow, %d Pos", ch_drive_lr.getPower(), ch_drive_lr.getCurrentPosition());
+        telemetry.addData("Drive (RF)", "%.2f Pow, %d Pos", ch_drive_rf.getPower(), ch_drive_rf.getCurrentPosition());
+        telemetry.addData("Drive (RR)", "%.2f Pow, %d Pos", ch_drive_rr.getPower(), ch_drive_rr.getCurrentPosition());
+        telemetry.addData("Wobble Arm", "%.2f Pow, %d Pos", eh_motor_2.getPower(), eh_motor_2.getCurrentPosition());
+        telemetry.addData("Wobble Arm Down Limit", eh_digital_0_1.getState());
+        telemetry.addData("Wobble Arm Up Limit", eh_digital_2_3.getState());
+        telemetry.addData("Wobble Latch Position", eh_servo_0.getPosition());
         telemetry.addData("Target Visible", navigationTargetVisible);
         telemetry.addData("Position (in)", position);
         telemetry.addData("Orientation", orientation);

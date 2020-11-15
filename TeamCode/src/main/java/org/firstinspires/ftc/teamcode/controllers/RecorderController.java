@@ -30,6 +30,8 @@ public class RecorderController extends RobotController {
         REPLAYING
     }
 
+    public RecorderState state = DISABLED;
+
     public static class RecorderSettings {
         public String redFileName;
         public String currentFileName;
@@ -39,7 +41,9 @@ public class RecorderController extends RobotController {
     public enum RecordSelect{
         PREV(-1),
         NEXT(1);
+
         public int value;
+
         RecordSelect(int value){
             this.value = value;
         }
@@ -48,8 +52,6 @@ public class RecorderController extends RobotController {
     private static String RecordingPath = "recordings/";
 
     private RecorderSettings settings = new RecorderSettings();
-
-    private RecorderState state = DISABLED;
 
     private List<Gamepad> gamepads = null;
 
@@ -77,7 +79,7 @@ public class RecorderController extends RobotController {
                 if (gamepad1.x && gamepad1.dpad_right) settings.blueFileName = selectRecording(settings.blueFileName, NEXT);
                 if (gamepad1.b && gamepad1.dpad_left) settings.redFileName = selectRecording(settings.redFileName, PREV);
                 if (gamepad1.b && gamepad1.dpad_right) settings.redFileName = selectRecording(settings.redFileName, NEXT);
-                if (gamepad1.dpad_right || gamepad1.dpad_left) saveSettings();
+                if (gamepad1.back || gamepad1.dpad_right || gamepad1.dpad_left) saveSettings();
                 break;
             case RECORDING:
                 if (gamepad1.back) enterIdle();
@@ -101,6 +103,8 @@ public class RecorderController extends RobotController {
     private void record() {
         Gamepad gamepad1copy = new Gamepad();
         Gamepad gamepad2copy = new Gamepad();
+
+        if (gamepads.isEmpty() && gamepad1.atRest() && gamepad2.atRest()) return;
 
         try {
             gamepad1copy.copy(gamepad1);
@@ -126,7 +130,7 @@ public class RecorderController extends RobotController {
     }
 
     private void enterIdle() {
-        if (state == RECORDING) saveRecording();
+        if (state == RECORDING) saveRecording(settings.currentFileName);
         state = IDLE;
     }
 
@@ -134,7 +138,7 @@ public class RecorderController extends RobotController {
         gamepads = new ArrayList<>();
         state = RECORDING;
         SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd--hh-mm-ss", Locale.US);
-        settings.currentFileName = RecordingPath + sim.format(new Date()) + ".json";
+        settings.currentFileName = sim.format(new Date()) + ".json";
     }
 
     private void enterReplaying( String fileName) {
@@ -160,7 +164,7 @@ public class RecorderController extends RobotController {
     private void saveSettings() {
         String json = SimpleGson.getInstance().toJson(settings);
         File file = AppUtil.getInstance().getSettingsFile(RecordingPath + "settings.json");
-        ReadWriteFile.writeFile(file,json);
+        ReadWriteFile.writeFile(file, json);
     }
 
     private void loadSettings() {
@@ -172,15 +176,16 @@ public class RecorderController extends RobotController {
             telemetry.addData("Error", "An error occurred attempting to load the settings" + e.toString());
         }
     }
-    private void saveRecording() {
+
+    private void saveRecording(String fileName) {
         String json = SimpleGson.getInstance().toJson(gamepads.toArray());
-        File file = AppUtil.getInstance().getSettingsFile(settings.currentFileName);
-        ReadWriteFile.writeFile(file,json);
+        File file = AppUtil.getInstance().getSettingsFile(RecordingPath + fileName);
+        ReadWriteFile.writeFile(file, json);
     }
 
-    private void loadRecording(String fileName ) {
+    private void loadRecording(String fileName) {
         try {
-            File file = AppUtil.getInstance().getSettingsFile(fileName);
+            File file = AppUtil.getInstance().getSettingsFile(RecordingPath + fileName);
             String json = ReadWriteFile.readFileOrThrow(file);
             gamepads = SimpleGson.getInstance().fromJson(json, new TypeToken<List<Gamepad>>(){}.getType());
         } catch(Exception e) {
