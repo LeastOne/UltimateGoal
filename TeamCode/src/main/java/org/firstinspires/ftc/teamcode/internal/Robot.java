@@ -34,6 +34,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+import static com.qualcomm.robotcore.hardware.DigitalChannel.Mode.INPUT;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.INTRINSIC;
@@ -154,7 +155,9 @@ public class Robot {
         eh_servo_5 = hardwareMap.get(RevBlinkinLedDriver.class,"eh_servo_5");
 
         eh_digital_0_1 = hardwareMap.get(DigitalChannel.class, "eh_digital_0_1");
+        eh_digital_0_1.setMode(INPUT);
         eh_digital_2_3 = hardwareMap.get(DigitalChannel.class, "eh_digital_2_3");
+        eh_digital_2_3.setMode(INPUT);
 
         try {
             webcamName = hardwareMap.get(WebcamName.class,"Webcam 1");
