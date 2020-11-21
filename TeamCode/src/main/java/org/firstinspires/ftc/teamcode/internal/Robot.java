@@ -7,12 +7,14 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.internal.camera.delegating.SwitchableCameraName;
 import org.firstinspires.ftc.teamcode.opmodes.OpMode;
 
 import java.util.List;
@@ -57,8 +59,6 @@ public class Robot {
     private static RevBlinkinLedDriver.BlinkinPattern PICKUP_COLOR = GREEN;
     private static RevBlinkinLedDriver.BlinkinPattern TARGET_COLOR = YELLOW;
 
-    public boolean diagnosticMode;
-
     private OpMode opMode;
 
     private BNO055IMU imu;
@@ -88,7 +88,9 @@ public class Robot {
 
     private VisionThread visionThread;
 
-    public WebcamName webcamName;
+    public SwitchableCameraName switchableCameraName;
+    public WebcamName ringWebcamName;
+    public WebcamName navigationWebcamName;
     public int cameraMonitorViewId;
     public int tfodMonitorViewId;
 
@@ -109,8 +111,6 @@ public class Robot {
     public List<Recognition> recognitions = null;
 
     public String error;
-
-    public boolean mecanumMode = true;
 
     public Robot(OpMode opMode) {
         this.opMode = opMode;
@@ -197,7 +197,9 @@ public class Robot {
         shooterFlipper = hardwareMap.get(Servo.class,"shooterFlipper");
 
         try {
-            webcamName = hardwareMap.get(WebcamName.class,"Webcam 1");
+            ringWebcamName = hardwareMap.get(WebcamName.class,"Webcam 1");
+            navigationWebcamName = hardwareMap.get(WebcamName.class,"Webcam 2");
+            switchableCameraName = ClassFactory.getInstance().getCameraManager().nameForSwitchableCamera(ringWebcamName, navigationWebcamName);
             cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId","id",hardwareMap.appContext.getPackageName());
 
@@ -255,11 +257,9 @@ public class Robot {
     public void drive(double drive, double strafe, double heading, double inches) {
         if (opMode.isStopping()) return;
 
-        double power = clamp(0.2, 1.0, drive + strafe);
+        turn(drive, strafe, heading);
 
-        turn(power, heading);
-
-        resetEncoders();
+        resetDriveEncoders(RUN_USING_ENCODER);
 
         int targetPosition = (int)(inches * TICKS_PER_INCH);
         int position = 0;
@@ -282,22 +282,26 @@ public class Robot {
         }
 
         this.drive(0, 0, 0);
+
+        opMode.sleep(250); // TO-DO: Remove!
     }
 
-    public void turn(double power, double heading) {
+    public void turn(double power, double strafe, double heading) {
         if (opMode.isStopping()) return;
 
-        power = Math.abs(power);
+        power = Math.abs(power * this.drivePower);
 
         double remainder, turn;
 
         do {
             remainder = getRemainderLeftToTurn(heading);
             turn = clamp(0.2, power, remainder / 45 * power);
-            drive(0, 0,turn);
+            drive(0, strafe * turn, turn);
         } while (!opMode.isStopping() && (remainder < -1 || remainder > 1));
 
-        drive(0, 0, 0);
+        drive(0,0, 0);
+
+        opMode.sleep(250); // TO-DO: Remove!
     }
 
     public void setLights(RevBlinkinLedDriver.BlinkinPattern pattern) {
@@ -389,7 +393,7 @@ public class Robot {
         ON, OFF, SHOOT
     }
 
-    public void shooter(ShooterMode mode){
+    public void shooter(ShooterMode mode) {
         switch(mode) {
             case ON:
                 shooterWheel.setPower(1);
@@ -407,6 +411,32 @@ public class Robot {
         }
     }
 
+    public int[] getMotorPositions() {
+        return new int[] {
+            driveLeftFront.getCurrentPosition(),
+            driveRightFront.getCurrentPosition(),
+            driveLeftRear.getCurrentPosition(),
+            driveRightRear.getCurrentPosition(),
+            intakeTop.getCurrentPosition(),
+            intakeBottom.getCurrentPosition(),
+            wobbleArm.getCurrentPosition()
+        };
+    }
+
+    public void setMotorPositions(int[] motorPositions) {
+        driveLeftFront.setTargetPosition(motorPositions[0]);
+        driveRightFront.setTargetPosition(motorPositions[1]);
+        driveLeftRear.setTargetPosition(motorPositions[2]);
+        driveRightRear.setTargetPosition(motorPositions[3]);
+        intakeTop.setTargetPosition(motorPositions[4]);
+        intakeBottom.setTargetPosition(motorPositions[5]);
+        wobbleArm.setTargetPosition(motorPositions[6]);
+    }
+
+    public void switchToCamera(WebcamName webcamName) {
+        this.visionThread.switchToCamera(webcamName);
+    }
+
     public void addTelemetry() {
         Telemetry telemetry = opMode.telemetry;
 
@@ -418,6 +448,8 @@ public class Robot {
         telemetry.addData("Drive (LR)", "%.2f Pow, %d Pos", driveLeftRear.getPower(), driveLeftRear.getCurrentPosition());
         telemetry.addData("Drive (RF)", "%.2f Pow, %d Pos", driveRightFront.getPower(), driveRightFront.getCurrentPosition());
         telemetry.addData("Drive (RR)", "%.2f Pow, %d Pos", driveRightRear.getPower(), driveRightRear.getCurrentPosition());
+        telemetry.addData("Intake Top", "%.2f Pow, %d Pos", intakeTop.getPower(), intakeTop.getCurrentPosition());
+        telemetry.addData("Intake Bottom", "%.2f Pow, %d Pos", intakeBottom.getPower(), intakeBottom.getCurrentPosition());
         telemetry.addData("Wobble Arm", "%.2f Pow, %d Pos", wobbleArm.getPower(), wobbleArm.getCurrentPosition());
         telemetry.addData("Wobble Arm Down Limit", wobbleLimitBack.getState());
         telemetry.addData("Wobble Arm Up Limit", wobbleLimitFront.getState());
@@ -454,6 +486,24 @@ public class Robot {
         return imu.getAngularOrientation(INTRINSIC, ZYX, DEGREES);
     }
 
+    public void resetDriveEncoders(DcMotor.RunMode runMode) {
+        driveLeftFront.setMode(STOP_AND_RESET_ENCODER);
+        driveLeftFront.setTargetPosition(0);
+        driveLeftFront.setMode(runMode);
+
+        driveRightFront.setMode(STOP_AND_RESET_ENCODER);
+        driveRightFront.setTargetPosition(0);
+        driveRightFront.setMode(runMode);
+
+        driveLeftRear.setMode(STOP_AND_RESET_ENCODER);
+        driveLeftRear.setTargetPosition(0);
+        driveLeftRear.setMode(runMode);
+
+        driveRightRear.setMode(STOP_AND_RESET_ENCODER);
+        driveRightRear.setTargetPosition(0);
+        driveRightRear.setMode(runMode);
+    }
+
     private double getRemainderLeftToTurn(double heading) {
         double remainder;
         orientation = getOrientation();
@@ -461,17 +511,6 @@ public class Robot {
         if (remainder > +180) remainder -= 360;
         if (remainder < -180) remainder += 360;
         return remainder;
-    }
-
-    private void resetEncoders() {
-        driveLeftFront.setMode(STOP_AND_RESET_ENCODER);
-        driveLeftFront.setMode(RUN_USING_ENCODER);
-        driveLeftRear.setMode(STOP_AND_RESET_ENCODER);
-        driveLeftRear.setMode(RUN_USING_ENCODER);
-        driveRightFront.setMode(STOP_AND_RESET_ENCODER);
-        driveRightFront.setMode(RUN_USING_ENCODER);
-        driveRightRear.setMode(STOP_AND_RESET_ENCODER);
-        driveRightRear.setMode(RUN_USING_ENCODER);
     }
 
     private double clamp(double min, double max, double value) {

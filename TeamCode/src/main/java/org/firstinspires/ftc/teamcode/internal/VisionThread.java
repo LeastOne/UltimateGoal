@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.internal;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.SwitchableCamera;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -63,7 +65,7 @@ public class VisionThread extends Thread {
         try {
             VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(robot.cameraMonitorViewId);
             parameters.vuforiaLicenseKey = VUFORIA_KEY;
-            parameters.cameraName = robot.webcamName;
+            parameters.cameraName = robot.switchableCameraName;
 
             vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
@@ -114,7 +116,7 @@ public class VisionThread extends Thread {
                     .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, -90, 0, -75));
 
             for (VuforiaTrackable trackable : allTrackables) {
-                ((VuforiaTrackableDefaultListener) trackable.getListener()).setCameraLocationOnRobot(robot.webcamName, robotFromCamera);
+                ((VuforiaTrackableDefaultListener) trackable.getListener()).setCameraLocationOnRobot(robot.switchableCameraName, robotFromCamera);
             }
 
             targetsUltimateGoal.activate();
@@ -174,5 +176,10 @@ public class VisionThread extends Thread {
         } catch (Exception e) {
             robot.error = e.toString();
         }
+    }
+
+    public void switchToCamera(CameraName cameraName) {
+        SwitchableCamera switchableCamera = (SwitchableCamera) vuforia.getCamera();
+        switchableCamera.setActiveCamera(cameraName);
     }
 }

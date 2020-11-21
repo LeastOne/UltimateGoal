@@ -21,6 +21,8 @@ public class Blue2OpMode extends BlueOpMode {
             }
         }
 
+        robot.switchToCamera(robot.navigationWebcamName);
+
         switch (recognitionLabel) {
             case "Quad": this.targetC(); break;
             case "Single": this.targetB(); break;
@@ -41,6 +43,7 @@ public class Blue2OpMode extends BlueOpMode {
     }
 
     protected void targetB() {
+        robot.turn(1, -1, -15);
         robot.drive(1,0,-15,51);
         robot.drive(-1,0,-15,51);
         robot.drive(-1,0,0,30);

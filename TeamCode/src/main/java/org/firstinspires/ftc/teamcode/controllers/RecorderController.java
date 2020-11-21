@@ -15,6 +15,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecorderState.DISABLED;
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecordSelect.NEXT;
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecordSelect.PREV;
@@ -23,7 +25,7 @@ import static org.firstinspires.ftc.teamcode.controllers.RecorderController.Reco
 import static org.firstinspires.ftc.teamcode.controllers.RecorderController.RecorderState.REPLAYING;
 
 public class RecorderController extends RobotController {
-    public enum RecorderState{
+    public enum RecorderState {
         DISABLED,
         IDLE,
         RECORDING,
@@ -38,7 +40,7 @@ public class RecorderController extends RobotController {
         public String blueFileName;
     }
 
-    public enum RecordSelect{
+    public enum RecordSelect {
         PREV(-1),
         NEXT(1);
 
@@ -49,11 +51,24 @@ public class RecorderController extends RobotController {
         }
     }
 
+    public static class RecorderSnapshot {
+        public long timestamp = System.currentTimeMillis();
+        public Gamepad[] gamepads = new Gamepad[] { new Gamepad(), new Gamepad() };
+        public int[] motorPositions;
+    }
+
     private static String BASE_DIR = "recordings/";
+
+    private long replayStart;
+    private long recordStart;
 
     private RecorderSettings settings = new RecorderSettings();
 
-    private List<Gamepad> gamepads = new ArrayList<>();
+    private List<RecorderSnapshot> snapshots = new ArrayList<>();
+
+    private boolean isSlept = true;
+    private boolean isSleepSynced = true;
+    private boolean isPosSynced = false;
 
     public RecorderController(OpMode opMode) {
         super(opMode);
@@ -63,9 +78,8 @@ public class RecorderController extends RobotController {
     @Override
     public void execute() {
         //Start, Back, and not at rest to start recording mode
-        if(gamepad1.start && gamepad1.back && !gamepad1.atRest()) state =  IDLE;
-
-        if(state == DISABLED) return;
+        if (gamepad1.start && gamepad1.back && !gamepad1.atRest()) state =  IDLE;
+        if (state == DISABLED) return;
 
         switch(state) {
             case IDLE:
@@ -87,13 +101,13 @@ public class RecorderController extends RobotController {
                 break;
             case REPLAYING:
                 if (gamepad1.back) enterIdle();
-                else if (gamepads.size() != 0) replay();
+                else if (snapshots.size() != 0) replay();
                 else enterIdle();
                 break;
         }
 
         telemetry.addData("Recording State", state);
-        telemetry.addData("Gamepad States", gamepads == null ? 0 : gamepads.size());
+        telemetry.addData("Gamepad States", snapshots == null ? 0 : snapshots.size());
         telemetry.addData("Current Recording", settings.currentFileName);
         telemetry.addData("Blue Recording", settings.blueFileName);
         telemetry.addData("Red Recording", settings.redFileName);
@@ -101,29 +115,40 @@ public class RecorderController extends RobotController {
     }
 
     private void record() {
-        Gamepad gamepad1copy = new Gamepad();
-        Gamepad gamepad2copy = new Gamepad();
+        if (snapshots.isEmpty() && gamepad1.atRest() && gamepad2.atRest()) return;
 
-        if (gamepads.isEmpty() && gamepad1.atRest() && gamepad2.atRest()) return;
+        RecorderSnapshot snapshot = new RecorderSnapshot();
 
         try {
-            gamepad1copy.copy(gamepad1);
-            gamepad2copy.copy(gamepad2);
+            snapshot.gamepads[0].copy(gamepad1);
+            snapshot.gamepads[1].copy(gamepad2);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        gamepads.add(gamepad1copy);
-        gamepads.add(gamepad2copy);
+        if (isSlept) opMode.sleep(50);
+
+        snapshot.motorPositions = robot.getMotorPositions();
+
+        snapshots.add(snapshot);
     }
 
     private void replay() {
-        Gamepad gamepad1Copy = gamepads.remove(0);
-        Gamepad gamepad2Copy = gamepads.remove(0);
+        RecorderSnapshot snapshot = snapshots.remove(0);
+
+        if (isPosSynced) robot.setMotorPositions(snapshot.motorPositions);
+
+        if (isSleepSynced) {
+            long replayDuration = System.currentTimeMillis() - replayStart;
+            long recordDuration = snapshot.timestamp - recordStart;
+            long sleep = recordDuration - replayDuration;
+
+            if (sleep > 0) opMode.sleep(sleep);
+        }
 
         try {
-            gamepad1.copy(gamepad1Copy);
-            gamepad2.copy(gamepad2Copy);
+            gamepad1.copy(snapshot.gamepads[0]);
+            gamepad2.copy(snapshot.gamepads[1]);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -132,18 +157,23 @@ public class RecorderController extends RobotController {
     private void enterIdle() {
         if (state == RECORDING) saveRecording(settings.currentFileName);
         state = IDLE;
+        robot.resetDriveEncoders(RUN_USING_ENCODER);
     }
 
     private void enterRecording() {
-        gamepads.clear();
+        snapshots.clear();
         state = RECORDING;
-        SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd--hh-mm-ss", Locale.US);
+        robot.resetDriveEncoders(RUN_USING_ENCODER);
+        SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd--HH-mm-ss", Locale.US);
         settings.currentFileName = sim.format(new Date()) + ".json";
     }
 
     private void enterReplaying(String fileName) {
         state = REPLAYING;
+        robot.resetDriveEncoders(isPosSynced ? RUN_TO_POSITION : RUN_USING_ENCODER);
         loadRecording(fileName);
+        replayStart = System.currentTimeMillis();
+        recordStart = snapshots.get(0).timestamp;
     }
 
     private String selectRecording(String filename, RecordSelect select) {
@@ -183,7 +213,7 @@ public class RecorderController extends RobotController {
     }
 
     private void saveRecording(String fileName) {
-        String json = SimpleGson.getInstance().toJson(gamepads.toArray());
+        String json = SimpleGson.getInstance().toJson(snapshots.toArray());
         File file = AppUtil.getInstance().getSettingsFile(BASE_DIR + fileName);
         ReadWriteFile.writeFile(file, json);
     }
@@ -193,7 +223,7 @@ public class RecorderController extends RobotController {
             File file = AppUtil.getInstance().getSettingsFile(BASE_DIR + fileName);
             if (!file.exists()) return;
             String json = ReadWriteFile.readFileOrThrow(file);
-            gamepads = SimpleGson.getInstance().fromJson(json, new TypeToken<List<Gamepad>>(){}.getType());
+            snapshots = SimpleGson.getInstance().fromJson(json, new TypeToken<List<RecorderSnapshot>>(){}.getType());
         } catch(Exception e) {
             telemetry.addData("Error","An error occurred attempting to load the recording data" + e.toString());
         }
