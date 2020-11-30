@@ -63,16 +63,16 @@ public class Robot {
     private DcMotor ch_drive_rf;
     private DcMotor ch_drive_rr;
 
-    private DcMotor eh_motor_0;
-    private DcMotor eh_motor_1;
-    private DcMotor eh_motor_2;
+    private DcMotor wobbleLatch;
+    private DcMotor intakeBottom;
+    private DcMotor wobbleArm;
     private DcMotor eh_motor_3;
 
     private Servo eh_servo_0;
-    private RevBlinkinLedDriver eh_servo_5;
+    private RevBlinkinLedDriver lights;
 
-    private DigitalChannel eh_digital_0_1;
-    private DigitalChannel eh_digital_2_3;
+    private DigitalChannel wobbleLimit;
+    private DigitalChannel wobbleTouch;
 
     private VisionThread visionThread;
 
@@ -131,20 +131,20 @@ public class Robot {
         ch_drive_rr.setMode(RUN_USING_ENCODER);
         ch_drive_rr.setDirection(FORWARD);
 
-        eh_motor_0 = hardwareMap.get(DcMotor.class, "eh_motor_0");
-        eh_motor_0.setMode(STOP_AND_RESET_ENCODER);
-        eh_motor_0.setMode(RUN_USING_ENCODER);
-        eh_motor_0.setDirection(FORWARD);
+        wobbleLatch = hardwareMap.get(DcMotor.class, "eh_motor_0");
+        wobbleLatch.setMode(STOP_AND_RESET_ENCODER);
+        wobbleLatch.setMode(RUN_USING_ENCODER);
+        wobbleLatch.setDirection(FORWARD);
 
-        eh_motor_1 = hardwareMap.get(DcMotor.class, "eh_motor_1");
-        eh_motor_1.setMode(STOP_AND_RESET_ENCODER);
-        eh_motor_1.setMode(RUN_USING_ENCODER);
-        eh_motor_1.setDirection(FORWARD);
+        intakeBottom = hardwareMap.get(DcMotor.class, "eh_motor_1");
+        intakeBottom.setMode(STOP_AND_RESET_ENCODER);
+        intakeBottom.setMode(RUN_USING_ENCODER);
+        intakeBottom.setDirection(FORWARD);
 
-        eh_motor_2 = hardwareMap.get(DcMotor.class, "eh_motor_2");
-        eh_motor_2.setMode(STOP_AND_RESET_ENCODER);
-        eh_motor_2.setMode(RUN_USING_ENCODER);
-        eh_motor_2.setDirection(FORWARD);
+        wobbleArm = hardwareMap.get(DcMotor.class, "eh_motor_2");
+        wobbleArm.setMode(STOP_AND_RESET_ENCODER);
+        wobbleArm.setMode(RUN_USING_ENCODER);
+        wobbleArm.setDirection(FORWARD);
 
         eh_motor_3 = hardwareMap.get(DcMotor.class, "eh_motor_3");
         eh_motor_3.setMode(STOP_AND_RESET_ENCODER);
@@ -152,12 +152,12 @@ public class Robot {
         eh_motor_3.setDirection(FORWARD);
 
         eh_servo_0 = hardwareMap.get(Servo.class,"eh_servo_0");
-        eh_servo_5 = hardwareMap.get(RevBlinkinLedDriver.class,"eh_servo_5");
+        lights = hardwareMap.get(RevBlinkinLedDriver.class,"eh_servo_5");
 
-        eh_digital_0_1 = hardwareMap.get(DigitalChannel.class, "eh_digital_0_1");
-        eh_digital_0_1.setMode(INPUT);
-        eh_digital_2_3 = hardwareMap.get(DigitalChannel.class, "eh_digital_2_3");
-        eh_digital_2_3.setMode(INPUT);
+        wobbleLimit = hardwareMap.get(DigitalChannel.class, "eh_digital_0_1");
+        wobbleLimit.setMode(INPUT);
+        wobbleTouch = hardwareMap.get(DigitalChannel.class, "eh_digital_2_3");
+        wobbleTouch.setMode(INPUT);
 
         try {
             webcamName = hardwareMap.get(WebcamName.class,"Webcam 1");
@@ -221,7 +221,7 @@ public class Robot {
     }
 
     public void setLights(RevBlinkinLedDriver.BlinkinPattern pattern) {
-        eh_servo_5.setPattern(pattern == BLACK ? DEFAULT_COLOR : pattern);
+        lights.setPattern(pattern == BLACK ? DEFAULT_COLOR : pattern);
     }
 
     private double getOffset(Recognition item) {
@@ -234,9 +234,9 @@ public class Robot {
     }
 
     public void setAttachmentMotorPower(double power0, double power1, double power2, double power3) {
-        eh_motor_0.setPower(power0);
-        eh_motor_1.setPower(power1);
-        eh_motor_2.setPower(power2);
+        wobbleLatch.setPower(power0);
+        intakeBottom.setPower(power1);
+        wobbleArm.setPower(power2);
         eh_motor_3.setPower(power3);
     }
 
@@ -251,11 +251,11 @@ public class Robot {
     }
 
     public void wobbleArm(WobbleArmPosition position) {
-        if ((position == UP && !eh_digital_0_1.getState()) ||
-            (position == DOWN && !eh_digital_2_3.getState())) {
-            eh_motor_2.setPower(0);
+        if ((position == UP && !wobbleLimit.getState()) ||
+            (position == DOWN && !wobbleTouch.getState())) {
+            wobbleArm.setPower(0);
         } else {
-            eh_motor_2.setPower(position.power);
+            wobbleArm.setPower(position.power);
         }
     }
 
@@ -284,9 +284,9 @@ public class Robot {
         telemetry.addData("Drive (LR)", "%.2f Pow, %d Pos", ch_drive_lr.getPower(), ch_drive_lr.getCurrentPosition());
         telemetry.addData("Drive (RF)", "%.2f Pow, %d Pos", ch_drive_rf.getPower(), ch_drive_rf.getCurrentPosition());
         telemetry.addData("Drive (RR)", "%.2f Pow, %d Pos", ch_drive_rr.getPower(), ch_drive_rr.getCurrentPosition());
-        telemetry.addData("Wobble Arm", "%.2f Pow, %d Pos", eh_motor_2.getPower(), eh_motor_2.getCurrentPosition());
-        telemetry.addData("Wobble Arm Down Limit", eh_digital_0_1.getState());
-        telemetry.addData("Wobble Arm Up Limit", eh_digital_2_3.getState());
+        telemetry.addData("Wobble Arm", "%.2f Pow, %d Pos", wobbleArm.getPower(), wobbleArm.getCurrentPosition());
+        telemetry.addData("Wobble Arm Down Limit", wobbleLimit.getState());
+        telemetry.addData("Wobble Arm Up Limit", wobbleTouch.getState());
         telemetry.addData("Wobble Latch Position", eh_servo_0.getPosition());
         telemetry.addData("Target Visible", navigationTargetVisible);
         telemetry.addData("Position (in)", position);
