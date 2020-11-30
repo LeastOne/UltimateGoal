@@ -58,17 +58,16 @@ public class Robot {
 
     private BNO055IMU imu;
 
-    private DcMotor ch_drive_lf;
-    private DcMotor ch_drive_lr;
-    private DcMotor ch_drive_rf;
-    private DcMotor ch_drive_rr;
+    private DcMotor driveLeftFront;
+    private DcMotor driveLeftRear;
+    private DcMotor driveRightFront;
+    private DcMotor driveRightRear;
 
-    private DcMotor wobbleLatch;
+    private DcMotor intakeTop;
     private DcMotor intakeBottom;
     private DcMotor wobbleArm;
-    private DcMotor eh_motor_3;
 
-    private Servo eh_servo_0;
+    private Servo wobbleLatch;
     private RevBlinkinLedDriver lights;
 
     private DigitalChannel wobbleLimit;
@@ -111,30 +110,30 @@ public class Robot {
         imu = hardwareMap.get(BNO055IMU.class, "ch_i2c_0");
         imu.initialize(parameters);
 
-        ch_drive_lf = hardwareMap.get(DcMotor.class, "ch_drive_lf");
-        ch_drive_lf.setMode(STOP_AND_RESET_ENCODER);
-        ch_drive_lf.setMode(RUN_USING_ENCODER);
-        ch_drive_lf.setDirection(REVERSE);
+        driveLeftFront = hardwareMap.get(DcMotor.class, "ch_drive_lf");
+        driveLeftFront.setMode(STOP_AND_RESET_ENCODER);
+        driveLeftFront.setMode(RUN_USING_ENCODER);
+        driveLeftFront.setDirection(REVERSE);
 
-        ch_drive_rf = hardwareMap.get(DcMotor.class,"ch_drive_rf");
-        ch_drive_rf.setMode(STOP_AND_RESET_ENCODER);
-        ch_drive_rf.setMode(RUN_USING_ENCODER);
-        ch_drive_rf.setDirection(FORWARD);
+        driveRightFront = hardwareMap.get(DcMotor.class,"ch_drive_rf");
+        driveRightFront.setMode(STOP_AND_RESET_ENCODER);
+        driveRightFront.setMode(RUN_USING_ENCODER);
+        driveRightFront.setDirection(FORWARD);
 
-        ch_drive_lr = hardwareMap.get(DcMotor.class,"ch_drive_lr");
-        ch_drive_lr.setMode(STOP_AND_RESET_ENCODER);
-        ch_drive_lr.setMode(RUN_USING_ENCODER);
-        ch_drive_lr.setDirection(REVERSE);
+        driveLeftRear = hardwareMap.get(DcMotor.class,"ch_drive_lr");
+        driveLeftRear.setMode(STOP_AND_RESET_ENCODER);
+        driveLeftRear.setMode(RUN_USING_ENCODER);
+        driveLeftRear.setDirection(REVERSE);
 
-        ch_drive_rr = hardwareMap.get(DcMotor.class, "ch_drive_rr");
-        ch_drive_rr.setMode(STOP_AND_RESET_ENCODER);
-        ch_drive_rr.setMode(RUN_USING_ENCODER);
-        ch_drive_rr.setDirection(FORWARD);
+        driveRightRear = hardwareMap.get(DcMotor.class, "ch_drive_rr");
+        driveRightRear.setMode(STOP_AND_RESET_ENCODER);
+        driveRightRear.setMode(RUN_USING_ENCODER);
+        driveRightRear.setDirection(FORWARD);
 
-        wobbleLatch = hardwareMap.get(DcMotor.class, "eh_motor_0");
-        wobbleLatch.setMode(STOP_AND_RESET_ENCODER);
-        wobbleLatch.setMode(RUN_USING_ENCODER);
-        wobbleLatch.setDirection(FORWARD);
+        intakeTop = hardwareMap.get(DcMotor.class, "eh_motor_0");
+        intakeTop.setMode(STOP_AND_RESET_ENCODER);
+        intakeTop.setMode(RUN_USING_ENCODER);
+        intakeTop.setDirection(FORWARD);
 
         intakeBottom = hardwareMap.get(DcMotor.class, "eh_motor_1");
         intakeBottom.setMode(STOP_AND_RESET_ENCODER);
@@ -146,12 +145,7 @@ public class Robot {
         wobbleArm.setMode(RUN_USING_ENCODER);
         wobbleArm.setDirection(FORWARD);
 
-        eh_motor_3 = hardwareMap.get(DcMotor.class, "eh_motor_3");
-        eh_motor_3.setMode(STOP_AND_RESET_ENCODER);
-        eh_motor_3.setMode(RUN_USING_ENCODER);
-        eh_motor_3.setDirection(FORWARD);
-
-        eh_servo_0 = hardwareMap.get(Servo.class,"eh_servo_0");
+        wobbleLatch = hardwareMap.get(Servo.class,"eh_servo_0");
         lights = hardwareMap.get(RevBlinkinLedDriver.class,"eh_servo_5");
 
         wobbleLimit = hardwareMap.get(DigitalChannel.class, "eh_digital_0_1");
@@ -205,19 +199,19 @@ public class Robot {
             right /= max;
         }
 
-        ch_drive_lf.setPower(left);
-        ch_drive_lr.setPower(left);
-        ch_drive_rf.setPower(right);
-        ch_drive_rr.setPower(right);
+        driveLeftFront.setPower(left);
+        driveLeftRear.setPower(left);
+        driveRightFront.setPower(right);
+        driveRightRear.setPower(right);
     }
 
     public void drive(double lf, double lr, double rf, double rr) {
         if (opMode.isStopping()) return;
 
-        ch_drive_lf.setPower(lf);
-        ch_drive_lr.setPower(lr);
-        ch_drive_rf.setPower(rf);
-        ch_drive_rr.setPower(rr);
+        driveLeftFront.setPower(lf);
+        driveLeftRear.setPower(lr);
+        driveRightFront.setPower(rf);
+        driveRightRear.setPower(rr);
     }
 
     public void setLights(RevBlinkinLedDriver.BlinkinPattern pattern) {
@@ -234,10 +228,9 @@ public class Robot {
     }
 
     public void setAttachmentMotorPower(double power0, double power1, double power2, double power3) {
-        wobbleLatch.setPower(power0);
+        intakeTop.setPower(power0);
         intakeBottom.setPower(power1);
         wobbleArm.setPower(power2);
-        eh_motor_3.setPower(power3);
     }
 
     public enum WobbleArmPosition {
@@ -270,7 +263,7 @@ public class Robot {
     }
 
     public void wobbleLatch(WobbleLatchPosition position) {
-        eh_servo_0.setPosition(position.value);
+        wobbleLatch.setPosition(position.value);
     }
 
     public void addTelemetry() {
@@ -280,14 +273,14 @@ public class Robot {
 
         telemetry.addData("Drive", "%.2f Pow", opMode.gamepad2.left_stick_y);
         telemetry.addData("Turn", "%.2f Pow", opMode.gamepad2.right_stick_x);
-        telemetry.addData("Drive (LF)", "%.2f Pow, %d Pos", ch_drive_lf.getPower(), ch_drive_lf.getCurrentPosition());
-        telemetry.addData("Drive (LR)", "%.2f Pow, %d Pos", ch_drive_lr.getPower(), ch_drive_lr.getCurrentPosition());
-        telemetry.addData("Drive (RF)", "%.2f Pow, %d Pos", ch_drive_rf.getPower(), ch_drive_rf.getCurrentPosition());
-        telemetry.addData("Drive (RR)", "%.2f Pow, %d Pos", ch_drive_rr.getPower(), ch_drive_rr.getCurrentPosition());
+        telemetry.addData("Drive (LF)", "%.2f Pow, %d Pos", driveLeftFront.getPower(), driveLeftFront.getCurrentPosition());
+        telemetry.addData("Drive (LR)", "%.2f Pow, %d Pos", driveLeftRear.getPower(), driveLeftRear.getCurrentPosition());
+        telemetry.addData("Drive (RF)", "%.2f Pow, %d Pos", driveRightFront.getPower(), driveRightFront.getCurrentPosition());
+        telemetry.addData("Drive (RR)", "%.2f Pow, %d Pos", driveRightRear.getPower(), driveRightRear.getCurrentPosition());
         telemetry.addData("Wobble Arm", "%.2f Pow, %d Pos", wobbleArm.getPower(), wobbleArm.getCurrentPosition());
         telemetry.addData("Wobble Arm Down Limit", wobbleLimit.getState());
         telemetry.addData("Wobble Arm Up Limit", wobbleTouch.getState());
-        telemetry.addData("Wobble Latch Position", eh_servo_0.getPosition());
+        telemetry.addData("Wobble Latch Position", wobbleLatch.getPosition());
         telemetry.addData("Target Visible", navigationTargetVisible);
         telemetry.addData("Position (in)", position);
         telemetry.addData("Orientation", orientation);
@@ -330,14 +323,14 @@ public class Robot {
     }
 
     private void resetEncoders() {
-        ch_drive_lf.setMode(STOP_AND_RESET_ENCODER);
-        ch_drive_lf.setMode(RUN_USING_ENCODER);
-        ch_drive_lr.setMode(STOP_AND_RESET_ENCODER);
-        ch_drive_lr.setMode(RUN_USING_ENCODER);
-        ch_drive_rf.setMode(STOP_AND_RESET_ENCODER);
-        ch_drive_rf.setMode(RUN_USING_ENCODER);
-        ch_drive_rr.setMode(STOP_AND_RESET_ENCODER);
-        ch_drive_rr.setMode(RUN_USING_ENCODER);
+        driveLeftFront.setMode(STOP_AND_RESET_ENCODER);
+        driveLeftFront.setMode(RUN_USING_ENCODER);
+        driveLeftRear.setMode(STOP_AND_RESET_ENCODER);
+        driveLeftRear.setMode(RUN_USING_ENCODER);
+        driveRightFront.setMode(STOP_AND_RESET_ENCODER);
+        driveRightFront.setMode(RUN_USING_ENCODER);
+        driveRightRear.setMode(STOP_AND_RESET_ENCODER);
+        driveRightRear.setMode(RUN_USING_ENCODER);
     }
 
     private double clamp(double min, double max, double value) {
