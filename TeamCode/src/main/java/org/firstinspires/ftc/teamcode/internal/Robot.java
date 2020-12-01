@@ -32,6 +32,7 @@ import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.RED;
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.YELLOW;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import static com.qualcomm.robotcore.hardware.DigitalChannel.Mode.INPUT;
@@ -59,8 +60,8 @@ public class Robot {
     private BNO055IMU imu;
 
     private DcMotor driveLeftFront;
-    private DcMotor driveLeftRear;
     private DcMotor driveRightFront;
+    private DcMotor driveLeftRear;
     private DcMotor driveRightRear;
 
     private DcMotor intakeTop;
@@ -107,50 +108,57 @@ public class Robot {
         parameters.loggingEnabled = true;
         parameters.loggingTag = "IMU";
 
-        imu = hardwareMap.get(BNO055IMU.class, "ch_i2c_0");
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-        driveLeftFront = hardwareMap.get(DcMotor.class, "ch_drive_lf");
+        driveLeftFront = hardwareMap.get(DcMotor.class, "driveLeftFront");
+        driveLeftFront.setDirection(REVERSE);
+        driveLeftFront.setZeroPowerBehavior(BRAKE);
         driveLeftFront.setMode(STOP_AND_RESET_ENCODER);
         driveLeftFront.setMode(RUN_USING_ENCODER);
-        driveLeftFront.setDirection(REVERSE);
 
-        driveRightFront = hardwareMap.get(DcMotor.class,"ch_drive_rf");
+        driveRightFront = hardwareMap.get(DcMotor.class,"driveRightFront");
+        driveRightFront.setDirection(FORWARD);
+        driveRightFront.setZeroPowerBehavior(BRAKE);
         driveRightFront.setMode(STOP_AND_RESET_ENCODER);
         driveRightFront.setMode(RUN_USING_ENCODER);
-        driveRightFront.setDirection(FORWARD);
 
-        driveLeftRear = hardwareMap.get(DcMotor.class,"ch_drive_lr");
+        driveLeftRear = hardwareMap.get(DcMotor.class,"driveLeftRear");
+        driveLeftRear.setDirection(REVERSE);
+        driveLeftRear.setZeroPowerBehavior(BRAKE);
         driveLeftRear.setMode(STOP_AND_RESET_ENCODER);
         driveLeftRear.setMode(RUN_USING_ENCODER);
-        driveLeftRear.setDirection(REVERSE);
 
-        driveRightRear = hardwareMap.get(DcMotor.class, "ch_drive_rr");
+        driveRightRear = hardwareMap.get(DcMotor.class, "driveRightRear");
+        driveRightRear.setDirection(FORWARD);
+        driveRightRear.setZeroPowerBehavior(BRAKE);
         driveRightRear.setMode(STOP_AND_RESET_ENCODER);
         driveRightRear.setMode(RUN_USING_ENCODER);
-        driveRightRear.setDirection(FORWARD);
 
-        intakeTop = hardwareMap.get(DcMotor.class, "eh_motor_0");
+        intakeTop = hardwareMap.get(DcMotor.class, "intakeTop");
+        intakeTop.setDirection(FORWARD);
+        intakeTop.setZeroPowerBehavior(BRAKE);
         intakeTop.setMode(STOP_AND_RESET_ENCODER);
         intakeTop.setMode(RUN_USING_ENCODER);
-        intakeTop.setDirection(FORWARD);
 
-        intakeBottom = hardwareMap.get(DcMotor.class, "eh_motor_1");
+        intakeBottom = hardwareMap.get(DcMotor.class, "intakeBottom");
+        intakeBottom.setDirection(FORWARD);
+        intakeBottom.setZeroPowerBehavior(BRAKE);
         intakeBottom.setMode(STOP_AND_RESET_ENCODER);
         intakeBottom.setMode(RUN_USING_ENCODER);
-        intakeBottom.setDirection(FORWARD);
 
-        wobbleArm = hardwareMap.get(DcMotor.class, "eh_motor_2");
+        wobbleArm = hardwareMap.get(DcMotor.class, "wobbleArm");
+        wobbleArm.setDirection(FORWARD);
+        wobbleArm.setZeroPowerBehavior(BRAKE);
         wobbleArm.setMode(STOP_AND_RESET_ENCODER);
         wobbleArm.setMode(RUN_USING_ENCODER);
-        wobbleArm.setDirection(FORWARD);
 
-        wobbleLatch = hardwareMap.get(Servo.class,"eh_servo_0");
-        lights = hardwareMap.get(RevBlinkinLedDriver.class,"eh_servo_5");
+        wobbleLatch = hardwareMap.get(Servo.class,"wobbleLatch");
+        lights = hardwareMap.get(RevBlinkinLedDriver.class,"lights");
 
-        wobbleLimit = hardwareMap.get(DigitalChannel.class, "eh_digital_0_1");
+        wobbleLimit = hardwareMap.get(DigitalChannel.class, "wobbleLimit");
         wobbleLimit.setMode(INPUT);
-        wobbleTouch = hardwareMap.get(DigitalChannel.class, "eh_digital_2_3");
+        wobbleTouch = hardwareMap.get(DigitalChannel.class, "wobbleTouch");
         wobbleTouch.setMode(INPUT);
 
         try {
@@ -200,8 +208,8 @@ public class Robot {
         }
 
         driveLeftFront.setPower(left);
-        driveLeftRear.setPower(left);
         driveRightFront.setPower(right);
+        driveLeftRear.setPower(left);
         driveRightRear.setPower(right);
     }
 
@@ -209,8 +217,8 @@ public class Robot {
         if (opMode.isStopping()) return;
 
         driveLeftFront.setPower(lf);
-        driveLeftRear.setPower(lr);
         driveRightFront.setPower(rf);
+        driveLeftRear.setPower(lr);
         driveRightRear.setPower(rr);
     }
 
