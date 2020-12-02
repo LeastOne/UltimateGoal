@@ -39,8 +39,8 @@ import static com.qualcomm.robotcore.hardware.DigitalChannel.Mode.INPUT;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.INTRINSIC;
-import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmPosition.DOWN;
-import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmPosition.UP;
+import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmAction.DOWN;
+import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmAction.UP;
 
 public class Robot {
     private static final double INCHES_PER_ROTATION = 3.95 * Math.PI;
@@ -241,22 +241,22 @@ public class Robot {
         wobbleArm.setPower(power2);
     }
 
-    public enum WobbleArmPosition {
+    public enum WobbleArmAction {
         UP(0.10), DOWN(-0.10), STOP(0);
 
         public double power;
 
-        WobbleArmPosition(double power) {
+        WobbleArmAction(double power) {
             this.power = power;
         }
     }
 
-    public void wobbleArm(WobbleArmPosition position) {
-        if ((position == UP && !wobbleLimit.getState()) ||
-            (position == DOWN && !wobbleTouch.getState())) {
+    public void wobbleArm(WobbleArmAction action) {
+        if ((action == UP && !wobbleLimit.getState()) ||
+            (action == DOWN && !wobbleTouch.getState())) {
             wobbleArm.setPower(0);
         } else {
-            wobbleArm.setPower(position.power);
+            wobbleArm.setPower(action.power);
         }
     }
 

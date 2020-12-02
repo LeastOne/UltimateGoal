@@ -2,9 +2,9 @@ package org.firstinspires.ftc.teamcode.controllers;
 
 import org.firstinspires.ftc.teamcode.opmodes.OpMode;
 
-import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmPosition.DOWN;
-import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmPosition.STOP;
-import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmPosition.UP;
+import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmAction.DOWN;
+import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmAction.STOP;
+import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmAction.UP;
 import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleLatchPosition.CLOSED;
 import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleLatchPosition.OPEN;
 
