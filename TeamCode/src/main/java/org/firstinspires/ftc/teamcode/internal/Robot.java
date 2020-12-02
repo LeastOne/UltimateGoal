@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.internal;
 
+import android.os.PowerManager;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -194,27 +196,23 @@ public class Robot {
         setLights(DEFAULT_COLOR);
     }
 
-    public void drive(double power, double turn) {
+    public void drive(double drive, double strafe, double turn) {
         if (opMode.isStopping()) return;
 
-        double left = power + turn;
-        double right = power - turn;
+        // since left stick can be pushed in all directions to control the robot's movements, its "power" must be the actual
+        // distance from the center, or the hypotenuse of the right triangle formed by left_stick_x and left_stick_y
+        double r = Math.hypot(strafe, drive);
 
-        double max = Math.max(Math.abs(left), Math.abs(right));
+        // angle between x axis and "coordinates" of left stick
+        double robotAngle = Math.atan2(drive, strafe) - Math.PI / 4;
 
-        if (max > 1.0) {
-            left /= max;
-            right /= max;
-        }
+        // turn
+        double rightX = turn;
 
-        driveLeftFront.setPower(left);
-        driveRightFront.setPower(right);
-        driveLeftRear.setPower(left);
-        driveRightRear.setPower(right);
-    }
-
-    public void drive(double lf, double lr, double rf, double rr) {
-        if (opMode.isStopping()) return;
+        double lf = POWER * (r * Math.cos(robotAngle) + rightX);
+        double lr = POWER * (r * Math.sin(robotAngle) + rightX);
+        double rf = POWER * (r * Math.sin(robotAngle) - rightX);
+        double rr = POWER * (r * Math.cos(robotAngle) - rightX);
 
         driveLeftFront.setPower(lf);
         driveRightFront.setPower(rf);
@@ -222,6 +220,51 @@ public class Robot {
         driveRightRear.setPower(rr);
     }
 
+    public void drive(double drive, double strafe, double heading, double inches) {
+        if (!opMode.isStopping()) return;
+
+        turn(drive, heading);
+
+        resetEncoders();
+
+        int targetPosition = (int)(inches * TICKS_PER_INCH);
+        int position = 0;
+
+        double remainder, turn;
+
+        while (opMode.isStopping() && targetPosition - position > 0) {
+            remainder = getRemainderLeftToTurn(heading);
+            drive = clamp(0.2, drive, (1 - (double)position / targetPosition) * TICKS_PER_INCH * 12);
+            strafe = clamp(0.2, strafe, (1 - (double)position / targetPosition) * TICKS_PER_INCH * 12);
+            turn = remainder / 45;
+            drive(drive, strafe, turn);
+
+            position = (
+                    Math.abs(driveLeftFront.getCurrentPosition()) +
+                            Math.abs(driveLeftRear.getCurrentPosition()) +
+                            Math.abs(driveRightFront.getCurrentPosition()) +
+                            Math.abs(driveRightRear.getCurrentPosition())
+            ) / 4;
+        }
+
+        this.drive(0,0,0);
+    }
+
+    public void turn(double power, double heading) {
+        if (!opMode.isStopping()) return;
+
+        power = Math.abs(power);
+
+        double remainder, turn;
+
+        do {
+            remainder = getRemainderLeftToTurn(heading);
+            turn = clamp(0.2, power, remainder / 45 * power);
+            drive(0, 0,turn);
+        } while (opMode.isStopping() && (remainder < -1 || remainder > 1));
+
+        drive(0,0,0);
+    }
     public void setLights(RevBlinkinLedDriver.BlinkinPattern pattern) {
         lights.setPattern(pattern == BLACK ? DEFAULT_COLOR : pattern);
     }
