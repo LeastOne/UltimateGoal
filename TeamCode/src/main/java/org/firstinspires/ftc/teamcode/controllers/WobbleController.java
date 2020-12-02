@@ -15,10 +15,10 @@ public class WobbleController extends RobotController {
 
     @Override
     public void execute() {
-        if (gamepad2.left_bumper) robot.wobbleArm(DOWN);
-        else if (gamepad2.right_bumper) robot.wobbleArm(UP);
+        if (gamepad1.left_bumper) robot.wobbleArm(DOWN);
+        else if (gamepad1.right_bumper) robot.wobbleArm(UP);
         else robot.wobbleArm(STOP);
-        if (gamepad2.dpad_left) robot.wobbleLatch(CLOSED);
-        else if (gamepad2.dpad_right) robot.wobbleLatch(OPEN);
+        if (gamepad1.dpad_left) robot.wobbleLatch(CLOSED);
+        else if (gamepad1.dpad_right) robot.wobbleLatch(OPEN);
     }
 }

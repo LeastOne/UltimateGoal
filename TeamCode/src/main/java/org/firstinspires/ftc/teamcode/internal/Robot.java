@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.internal;
 
-import android.os.PowerManager;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -32,6 +30,7 @@ import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.LIGHT
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.RAINBOW_LAVA_PALETTE;
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.RED;
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
@@ -41,10 +40,12 @@ import static com.qualcomm.robotcore.hardware.DigitalChannel.Mode.INPUT;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.INTRINSIC;
+import static org.firstinspires.ftc.teamcode.internal.Robot.RobotDriveType.MECANUM;
 import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmAction.DOWN;
 import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmAction.UP;
 
 public class Robot {
+    private static final double DRIVE_POWER = 0.5;
     private static final double INCHES_PER_ROTATION = 3.95 * Math.PI;
     private static final double TICKS_PER_INCH = 1120 / INCHES_PER_ROTATION;
 
@@ -60,6 +61,12 @@ public class Robot {
     private OpMode opMode;
 
     private BNO055IMU imu;
+
+    public enum RobotDriveType {
+        STANDARD, MECANUM
+    }
+
+    private RobotDriveType driveType = MECANUM;
 
     private DcMotor driveLeftFront;
     private DcMotor driveRightFront;
@@ -199,6 +206,8 @@ public class Robot {
     public void drive(double drive, double strafe, double turn) {
         if (opMode.isStopping()) return;
 
+        if (driveType != MECANUM) strafe = 0;
+
         // since left stick can be pushed in all directions to control the robot's movements, its "power" must be the actual
         // distance from the center, or the hypotenuse of the right triangle formed by left_stick_x and left_stick_y
         double r = Math.hypot(strafe, drive);
@@ -206,13 +215,10 @@ public class Robot {
         // angle between x axis and "coordinates" of left stick
         double robotAngle = Math.atan2(drive, strafe) - Math.PI / 4;
 
-        // turn
-        double rightX = turn;
-
-        double lf = POWER * (r * Math.cos(robotAngle) + rightX);
-        double lr = POWER * (r * Math.sin(robotAngle) + rightX);
-        double rf = POWER * (r * Math.sin(robotAngle) - rightX);
-        double rr = POWER * (r * Math.cos(robotAngle) - rightX);
+        double lf = DRIVE_POWER * (r * Math.cos(robotAngle) + turn);
+        double lr = DRIVE_POWER * (r * Math.sin(robotAngle) + turn);
+        double rf = DRIVE_POWER * (r * Math.sin(robotAngle) - turn);
+        double rr = DRIVE_POWER * (r * Math.cos(robotAngle) - turn);
 
         driveLeftFront.setPower(lf);
         driveRightFront.setPower(rf);
@@ -221,9 +227,9 @@ public class Robot {
     }
 
     public void drive(double drive, double strafe, double heading, double inches) {
-        if (!opMode.isStopping()) return;
+        if (opMode.isStopping()) return;
 
-        turn(drive, heading);
+        turn(drive + strafe, heading);
 
         resetEncoders();
 
@@ -232,26 +238,26 @@ public class Robot {
 
         double remainder, turn;
 
-        while (opMode.isStopping() && targetPosition - position > 0) {
+        while (!opMode.isStopping() && targetPosition - position > 0) {
             remainder = getRemainderLeftToTurn(heading);
-            drive = clamp(0.2, drive, (1 - (double)position / targetPosition) * TICKS_PER_INCH * 12);
-            strafe = clamp(0.2, strafe, (1 - (double)position / targetPosition) * TICKS_PER_INCH * 12);
+            if (drive != 0) drive = clamp(0.2, drive, (1 - (double)position / targetPosition) * TICKS_PER_INCH * 12);
+            if (strafe != 0) strafe = clamp(0.2, strafe, (1 - (double)position / targetPosition) * TICKS_PER_INCH * 12);
             turn = remainder / 45;
             drive(drive, strafe, turn);
 
             position = (
-                    Math.abs(driveLeftFront.getCurrentPosition()) +
-                            Math.abs(driveLeftRear.getCurrentPosition()) +
-                            Math.abs(driveRightFront.getCurrentPosition()) +
-                            Math.abs(driveRightRear.getCurrentPosition())
+                Math.abs(driveLeftFront.getCurrentPosition()) +
+                Math.abs(driveLeftRear.getCurrentPosition()) +
+                Math.abs(driveRightFront.getCurrentPosition()) +
+                Math.abs(driveRightRear.getCurrentPosition())
             ) / 4;
         }
 
-        this.drive(0,0,0);
+        this.drive(0, 0, 0);
     }
 
     public void turn(double power, double heading) {
-        if (!opMode.isStopping()) return;
+        if (opMode.isStopping()) return;
 
         power = Math.abs(power);
 
@@ -261,10 +267,11 @@ public class Robot {
             remainder = getRemainderLeftToTurn(heading);
             turn = clamp(0.2, power, remainder / 45 * power);
             drive(0, 0,turn);
-        } while (opMode.isStopping() && (remainder < -1 || remainder > 1));
+        } while (!opMode.isStopping() && (remainder < -1 || remainder > 1));
 
-        drive(0,0,0);
+        drive(0, 0, 0);
     }
+
     public void setLights(RevBlinkinLedDriver.BlinkinPattern pattern) {
         lights.setPattern(pattern == BLACK ? DEFAULT_COLOR : pattern);
     }
@@ -285,7 +292,7 @@ public class Robot {
     }
 
     public enum WobbleArmAction {
-        UP(0.10), DOWN(-0.10), STOP(0);
+        UP(0.50), DOWN(-0.50), STOP(0);
 
         public double power;
 
@@ -301,6 +308,25 @@ public class Robot {
         } else {
             wobbleArm.setPower(action.power);
         }
+    }
+
+    public enum WobbleArmPosition {
+        DOWN(0), UP(1275), BACK(2550);
+
+        public int value;
+
+        WobbleArmPosition(int value) {
+            this.value = value;
+        }
+    }
+
+    public void wobbleArm(WobbleArmPosition position) {
+        wobbleArm.setPower(0.50);
+        wobbleArm.setTargetPosition(position.value);
+        wobbleArm.setMode(RUN_TO_POSITION);
+        while (!opMode.isStopping() && wobbleArm.isBusy()) opMode.sleep(50);
+        wobbleArm.setPower(0);
+        wobbleArm.setMode(RUN_USING_ENCODER);
     }
 
     public enum WobbleLatchPosition {
