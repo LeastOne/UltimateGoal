@@ -47,7 +47,7 @@ import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmAction.UP;
 public class Robot {
     private static final double DRIVE_POWER = 0.5;
     private static final double INCHES_PER_ROTATION = 3.95 * Math.PI;
-    private static final double TICKS_PER_INCH = 1120 / INCHES_PER_ROTATION;
+    private static final double TICKS_PER_INCH = 537.6 / INCHES_PER_ROTATION;
 
     private static RevBlinkinLedDriver.BlinkinPattern DEFAULT_COLOR = GRAY;
     private static RevBlinkinLedDriver.BlinkinPattern CALIBRATE_COLOR = RAINBOW_LAVA_PALETTE;
