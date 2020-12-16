@@ -7,11 +7,11 @@ public class BlueBOpMode extends BlueOpMode {
     @Override
     protected void execute() {
         robot.drive(1,0,0,24);
-        robot.drive(1,0,-20,48);
-        robot.drive(1,0,160,12);
-        robot.drive(1,0,-160,54);
-        robot.drive(1,0,90,24);
-        robot.drive(1,0,7,72);
-
+        robot.drive(1,0,-10,60);
+        robot.drive(-1,0,-10,60);
+        robot.drive(-1,0,0,24);
+        robot.drive(0,1,0,33);
+        robot.drive(1,0,0,42);
+        robot.drive(1,0,7,32);
     }
 }
