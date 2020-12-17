@@ -6,10 +6,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public class Blue2OpMode extends BlueOpMode {
     @Override
     protected void execute() {
-        robot.drive(1,0,0,40);
+        robot.drive(1,0,0,36);
 
         // check the rings
-        // based on the number of rings do one of the following:
+        // based on the number of rings do one of the following
 
         this.targetA();
         this.targetB();
@@ -17,14 +17,14 @@ public class Blue2OpMode extends BlueOpMode {
     }
 
     protected void targetA() {
-        robot.drive(1,0,0,18);
+        robot.drive(1,0,0,22);
         robot.drive(-1,0,0,58);
         robot.drive(0,1,0,36);
         robot.drive(1,0,25,69);
     }
 
     protected void targetB() {
-        robot.drive(1,0,-15,44);
+        robot.drive(1,0,-15,48);
         robot.drive(-1,0,-15,44);
         robot.drive(-1,0,0,40);
         robot.drive(0,1,0,33);
@@ -33,7 +33,7 @@ public class Blue2OpMode extends BlueOpMode {
     }
 
     protected void targetC() {
-        robot.drive(1,0,0,74); //drive to back of target area (but leave room for wobble goal)
+        robot.drive(1,0,0,78); //drive to back of target area (but leave room for wobble goal)
         //deposit first wobble goal
         robot.drive(-1,0,0,24);//back up
         robot.drive(0,1,0,54);//strafe right
