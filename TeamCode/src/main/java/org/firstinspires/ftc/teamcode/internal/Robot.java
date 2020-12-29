@@ -45,7 +45,7 @@ import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmAction.DOWN
 import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmAction.UP;
 
 public class Robot {
-    private static final double DRIVE_POWER = 0.5;
+    public double drivePower = 0.5;
     private static final double INCHES_PER_ROTATION = 3.95 * Math.PI;
     private static final double TICKS_PER_INCH = 537.6 / INCHES_PER_ROTATION;
 
@@ -119,6 +119,8 @@ public class Robot {
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+
+        drivePower = 0.5;
 
         driveLeftFront = hardwareMap.get(DcMotor.class, "driveLeftFront");
         driveLeftFront.setDirection(REVERSE);
@@ -215,10 +217,10 @@ public class Robot {
         // angle between x axis and "coordinates" of left stick
         double robotAngle = Math.atan2(drive, strafe) - Math.PI / 4;
 
-        double lf = DRIVE_POWER * (r * Math.cos(robotAngle) + turn);
-        double lr = DRIVE_POWER * (r * Math.sin(robotAngle) + turn);
-        double rf = DRIVE_POWER * (r * Math.sin(robotAngle) - turn);
-        double rr = DRIVE_POWER * (r * Math.cos(robotAngle) - turn);
+        double lf = drivePower * (r * Math.cos(robotAngle) + turn);
+        double lr = drivePower * (r * Math.sin(robotAngle) + turn);
+        double rf = drivePower * (r * Math.sin(robotAngle) - turn);
+        double rr = drivePower * (r * Math.cos(robotAngle) - turn);
 
         driveLeftFront.setPower(lf);
         driveRightFront.setPower(rf);
