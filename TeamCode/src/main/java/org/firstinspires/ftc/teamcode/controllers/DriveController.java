@@ -9,7 +9,6 @@ public class DriveController extends RobotController {
 
     @Override
     public void execute() {
-        robot.drivePower = 1;
         if (gamepad1.dpad_up) robot.drivePower = 1;
         else if (gamepad1.dpad_down) robot.drivePower = .2;
         robot.drive(
