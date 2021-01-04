@@ -16,9 +16,11 @@ public class Blue2OpMode extends BlueOpMode {
             }
         }
 
-        this.targetA();
-        this.targetB();
-        this.targetC();
+        switch (recognitionLabel){
+            case "Quad": this.targetC(); break;
+            case "Single": this.targetB(); break;
+            default: this.targetA(); break;
+        }
     }
 
     protected void targetA() {
