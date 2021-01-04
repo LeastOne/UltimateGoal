@@ -8,8 +8,13 @@ public class Blue2OpMode extends BlueOpMode {
     protected void execute() {
         robot.drive(1,0,0,36);
 
-        // check the rings
-        // based on the number of rings do one of the following
+        String recognitionLabel = "";
+        for (int i = 0; i < 60; i++){
+            sleep(50);
+            if (!robot.recognitions.isEmpty()){
+                recognitionLabel = robot.recognitions.get(0).getLabel();
+            }
+        }
 
         this.targetA();
         this.targetB();
