@@ -11,7 +11,7 @@ public class Blue2OpMode extends BlueOpMode {
         String recognitionLabel = "";
         for (int i = 0; i < 60; i++){
             sleep(50);
-            if (!robot.recognitions.isEmpty()){
+            if (robot.recognitions != null && !robot.recognitions.isEmpty()) {
                 recognitionLabel = robot.recognitions.get(0).getLabel();
             }
         }
