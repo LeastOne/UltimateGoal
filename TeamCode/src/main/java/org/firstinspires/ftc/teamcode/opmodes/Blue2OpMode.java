@@ -35,7 +35,7 @@ public class Blue2OpMode extends BlueOpMode {
         robot.wobbleArm(DOWN);
     }
 
-    //Target A - Final line will be experimental
+    //Target A - Final line will be experimental I do not know if it will work or where the wobble arm will end up.
 
     protected void targetB() {
         robot.drive(1,0,-15,48);
