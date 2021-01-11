@@ -120,7 +120,7 @@ public class VisionThread extends Thread {
             targetsUltimateGoal.activate();
 
             TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(robot.tfodMonitorViewId);
-            tfodParameters.minResultConfidence = 0.8f;
+            tfodParameters.minResultConfidence = 0.6f;
             tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
             tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
             tfod.activate();
