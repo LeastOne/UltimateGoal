@@ -2,10 +2,6 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.internal.Robot;
-
-import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmAction.DOWN;
-
 @Autonomous
 public class Blue2OpMode extends BlueOpMode {
     @Override
@@ -13,14 +9,14 @@ public class Blue2OpMode extends BlueOpMode {
         robot.drive(1,0,0,36);
 
         String recognitionLabel = "";
-        for (int i = 0; i < 60; i++){
+        for (int i = 0; i < 60; i++) {
             sleep(50);
             if (robot.recognitions != null && !robot.recognitions.isEmpty()) {
                 recognitionLabel = robot.recognitions.get(0).getLabel();
             }
         }
 
-        switch (recognitionLabel){
+        switch (recognitionLabel) {
             case "Quad": this.targetC(); break;
             case "Single": this.targetB(); break;
             default: this.targetA(); break;
@@ -32,10 +28,7 @@ public class Blue2OpMode extends BlueOpMode {
         robot.drive(-1,0,0,65);
         robot.drive(0,1,0,36);
         robot.drive(1,0,25,64);
-        robot.wobbleArm(DOWN);
     }
-
-    //Target A - Final line needs to move down farther.
 
     protected void targetB() {
         robot.drive(1,0,-15,48);
@@ -55,5 +48,4 @@ public class Blue2OpMode extends BlueOpMode {
         robot.drive(1,0,20,70);
         robot.drive(-1,0,0,30);
     }
-    //Back up
 }
