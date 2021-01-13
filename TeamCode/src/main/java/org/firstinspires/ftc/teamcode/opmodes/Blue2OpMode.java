@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public class Blue2OpMode extends BlueOpMode {
     @Override
     protected void execute() {
+        robot.drivePower = 0.6;
+
         robot.drive(1,0,0,37);
 
         String recognitionLabel = "";
@@ -42,7 +44,6 @@ public class Blue2OpMode extends BlueOpMode {
     }
 
     protected void targetC() {
-        robot.drivePower = 0.6;
         robot.drive(1,0,0,77);
         robot.drive(-1,0,0,114);
         robot.drive(0,1,0,34);

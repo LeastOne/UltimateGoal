@@ -45,7 +45,7 @@ import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmAction.DOWN
 import static org.firstinspires.ftc.teamcode.internal.Robot.WobbleArmAction.UP;
 
 public class Robot {
-    public double drivePower = 0.5;
+    public double drivePower = 1;
     private static final double INCHES_PER_ROTATION = 3.95 * Math.PI;
     private static final double TICKS_PER_INCH = 537.6 / INCHES_PER_ROTATION;
 
