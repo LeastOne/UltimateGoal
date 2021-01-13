@@ -78,6 +78,7 @@ public class Robot {
     private DcMotor wobbleArm;
 
     private Servo wobbleLatch;
+    private Servo wobbleRingLatch;
     private RevBlinkinLedDriver lights;
 
     private DigitalChannel wobbleLimit;
@@ -165,6 +166,7 @@ public class Robot {
         wobbleArm.setMode(RUN_USING_ENCODER);
 
         wobbleLatch = hardwareMap.get(Servo.class,"wobbleLatch");
+        wobbleRingLatch = hardwareMap.get(Servo.class,"wobbleRingLatch");
         lights = hardwareMap.get(RevBlinkinLedDriver.class,"lights");
 
         wobbleLimit = hardwareMap.get(DigitalChannel.class, "wobbleLimit");
@@ -345,6 +347,19 @@ public class Robot {
         wobbleLatch.setPosition(position.value);
     }
 
+    public enum WobbleRingLatchPosition {
+        OPEN(1), CLOSED(0);
+
+        public double value;
+
+        WobbleRingLatchPosition(double value) {
+            this.value = value;
+        }
+    }
+
+    public void wobbleRingLatch(WobbleRingLatchPosition position) {
+        wobbleRingLatch.setPosition(position.value);
+    }
     public void addTelemetry() {
         Telemetry telemetry = opMode.telemetry;
 
