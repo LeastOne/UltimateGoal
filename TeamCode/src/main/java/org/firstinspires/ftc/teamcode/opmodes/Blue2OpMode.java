@@ -45,8 +45,8 @@ public class Blue2OpMode extends BlueOpMode {
     }
 
     protected void targetC() {
-        robot.drive(1,0,0,77);
-        robot.drive(-1,0,0,114);
+        robot.drive(1,0,0,73);
+        robot.drive(-1,0,0,111);
         robot.drive(0,1,0,34);
         robot.drive(1,0,0,42);
         robot.drive(1,0,22,67);
