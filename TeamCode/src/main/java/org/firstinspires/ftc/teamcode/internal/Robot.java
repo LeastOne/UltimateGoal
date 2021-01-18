@@ -212,7 +212,7 @@ public class Robot {
 
         if (driveType != MECANUM) strafe = 0;
 
-        // since left stick can be pushed in all directions to control the robot's movements, its "power" must be the actual
+        // since left stick can be pushed in all directions to controlthe robot's movements, its "power" must be the actual
         // distance from the center, or the hypotenuse of the right triangle formed by left_stick_x and left_stick_y
         double r = Math.hypot(strafe, drive);
 
@@ -244,8 +244,8 @@ public class Robot {
 
         while (!opMode.isStopping() && targetPosition - position > 0) {
             remainder = getRemainderLeftToTurn(heading);
-            if (drive != 0) drive = clamp(0.2, drive, (1 - (double)position / targetPosition) * TICKS_PER_INCH * 12);
-            if (strafe != 0) strafe = clamp(0.2, strafe, (1 - (double)position / targetPosition) * TICKS_PER_INCH * 12);
+            if (drive != 0) drive = clamp(0.2, drive, (targetPosition - position) / TICKS_PER_INCH * 12);
+            if (strafe != 0) strafe = clamp(0.2, strafe, (targetPosition - position) / TICKS_PER_INCH * 12);
             turn = remainder / 45;
             drive(drive, strafe, turn);
 
