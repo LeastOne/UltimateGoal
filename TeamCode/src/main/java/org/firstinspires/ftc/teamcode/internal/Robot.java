@@ -81,8 +81,8 @@ public class Robot {
     private Servo wobbleRingLatch;
     private RevBlinkinLedDriver lights;
 
-    private DigitalChannel wobbleLimit;
-    private DigitalChannel wobbleTouch;
+    private DigitalChannel wobbleTouchBack;
+    private DigitalChannel wobbleTouchFront;
 
     private VisionThread visionThread;
 
@@ -169,10 +169,10 @@ public class Robot {
         wobbleRingLatch = hardwareMap.get(Servo.class,"wobbleRingLatch");
         lights = hardwareMap.get(RevBlinkinLedDriver.class,"lights");
 
-        wobbleLimit = hardwareMap.get(DigitalChannel.class, "wobbleLimit");
-        wobbleLimit.setMode(INPUT);
-        wobbleTouch = hardwareMap.get(DigitalChannel.class, "wobbleTouch");
-        wobbleTouch.setMode(INPUT);
+        wobbleTouchBack = hardwareMap.get(DigitalChannel.class, "wobbleTouchBack");
+        wobbleTouchBack.setMode(INPUT);
+        wobbleTouchFront = hardwareMap.get(DigitalChannel.class, "wobbleTouchFront");
+        wobbleTouchFront.setMode(INPUT);
 
         try {
             webcamName = hardwareMap.get(WebcamName.class,"Webcam 1");
@@ -306,8 +306,8 @@ public class Robot {
     }
 
     public void wobbleArm(WobbleArmAction action) {
-        if ((action == UP && !wobbleLimit.getState()) ||
-            (action == DOWN && !wobbleTouch.getState())) {
+        if ((action == UP && !wobbleTouchBack.getState()) ||
+            (action == DOWN && !wobbleTouchFront.getState())) {
             wobbleArm.setPower(0);
         } else {
             wobbleArm.setPower(action.power);
@@ -372,8 +372,8 @@ public class Robot {
         telemetry.addData("Drive (RF)", "%.2f Pow, %d Pos", driveRightFront.getPower(), driveRightFront.getCurrentPosition());
         telemetry.addData("Drive (RR)", "%.2f Pow, %d Pos", driveRightRear.getPower(), driveRightRear.getCurrentPosition());
         telemetry.addData("Wobble Arm", "%.2f Pow, %d Pos", wobbleArm.getPower(), wobbleArm.getCurrentPosition());
-        telemetry.addData("Wobble Arm Down Limit", wobbleLimit.getState());
-        telemetry.addData("Wobble Arm Up Limit", wobbleTouch.getState());
+        telemetry.addData("Wobble Arm Down Limit", wobbleTouchBack.getState());
+        telemetry.addData("Wobble Arm Up Limit", wobbleTouchFront.getState());
         telemetry.addData("Wobble Latch Position", wobbleLatch.getPosition());
         telemetry.addData("Target Visible", navigationTargetVisible);
         telemetry.addData("Position (in)", position);
