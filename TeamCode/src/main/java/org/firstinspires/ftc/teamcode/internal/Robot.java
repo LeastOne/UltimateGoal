@@ -81,8 +81,8 @@ public class Robot {
     private Servo wobbleRingLatch;
     private RevBlinkinLedDriver lights;
 
-    private DigitalChannel wobbleLimit;
-    private DigitalChannel wobbleTouch;
+    private DigitalChannel wobbleTouchBack;
+    private DigitalChannel wobbleTouchFront;
 
     private VisionThread visionThread;
 
@@ -169,10 +169,10 @@ public class Robot {
         wobbleRingLatch = hardwareMap.get(Servo.class,"wobbleRingLatch");
         lights = hardwareMap.get(RevBlinkinLedDriver.class,"lights");
 
-        wobbleLimit = hardwareMap.get(DigitalChannel.class, "wobbleLimit");
-        wobbleLimit.setMode(INPUT);
-        wobbleTouch = hardwareMap.get(DigitalChannel.class, "wobbleTouch");
-        wobbleTouch.setMode(INPUT);
+        wobbleTouchBack = hardwareMap.get(DigitalChannel.class, "wobbleTouchBack");
+        wobbleTouchBack.setMode(INPUT);
+        wobbleTouchFront = hardwareMap.get(DigitalChannel.class, "wobbleTouchFront");
+        wobbleTouchFront.setMode(INPUT);
 
         try {
             webcamName = hardwareMap.get(WebcamName.class,"Webcam 1");
@@ -212,7 +212,7 @@ public class Robot {
 
         if (driveType != MECANUM) strafe = 0;
 
-        // since left stick can be pushed in all directions to control the robot's movements, its "power" must be the actual
+        // since left stick can be pushed in all directions to controlthe robot's movements, its "power" must be the actual
         // distance from the center, or the hypotenuse of the right triangle formed by left_stick_x and left_stick_y
         double r = Math.hypot(strafe, drive);
 
@@ -244,8 +244,8 @@ public class Robot {
 
         while (!opMode.isStopping() && targetPosition - position > 0) {
             remainder = getRemainderLeftToTurn(heading);
-            if (drive != 0) drive = clamp(0.2, drive, (1 - (double)position / targetPosition) * TICKS_PER_INCH * 12);
-            if (strafe != 0) strafe = clamp(0.2, strafe, (1 - (double)position / targetPosition) * TICKS_PER_INCH * 12);
+            if (drive != 0) drive = clamp(0.2, drive, (targetPosition - position) / TICKS_PER_INCH * 12);
+            if (strafe != 0) strafe = clamp(0.2, strafe, (targetPosition - position) / TICKS_PER_INCH * 12);
             turn = remainder / 45;
             drive(drive, strafe, turn);
 
@@ -306,8 +306,8 @@ public class Robot {
     }
 
     public void wobbleArm(WobbleArmAction action) {
-        if ((action == UP && !wobbleLimit.getState()) ||
-            (action == DOWN && !wobbleTouch.getState())) {
+        if ((action == UP && !wobbleTouchBack.getState()) ||
+            (action == DOWN && !wobbleTouchFront.getState())) {
             wobbleArm.setPower(0);
         } else {
             wobbleArm.setPower(action.power);
@@ -372,8 +372,8 @@ public class Robot {
         telemetry.addData("Drive (RF)", "%.2f Pow, %d Pos", driveRightFront.getPower(), driveRightFront.getCurrentPosition());
         telemetry.addData("Drive (RR)", "%.2f Pow, %d Pos", driveRightRear.getPower(), driveRightRear.getCurrentPosition());
         telemetry.addData("Wobble Arm", "%.2f Pow, %d Pos", wobbleArm.getPower(), wobbleArm.getCurrentPosition());
-        telemetry.addData("Wobble Arm Down Limit", wobbleLimit.getState());
-        telemetry.addData("Wobble Arm Up Limit", wobbleTouch.getState());
+        telemetry.addData("Wobble Arm Down Limit", wobbleTouchBack.getState());
+        telemetry.addData("Wobble Arm Up Limit", wobbleTouchFront.getState());
         telemetry.addData("Wobble Latch Position", wobbleLatch.getPosition());
         telemetry.addData("Target Visible", navigationTargetVisible);
         telemetry.addData("Position (in)", position);
