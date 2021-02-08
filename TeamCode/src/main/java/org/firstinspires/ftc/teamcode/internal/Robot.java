@@ -34,6 +34,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import static com.qualcomm.robotcore.hardware.DigitalChannel.Mode.INPUT;
@@ -89,6 +90,9 @@ public class Robot {
     public WebcamName webcamName;
     public int cameraMonitorViewId;
     public int tfodMonitorViewId;
+
+    private DcMotor shooterWheel;
+    private Servo shooterFlipper;
 
     public boolean navigationTargetVisible = false;
     public Position position = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
@@ -173,6 +177,14 @@ public class Robot {
         wobbleTouchBack.setMode(INPUT);
         wobbleTouchFront = hardwareMap.get(DigitalChannel.class, "wobbleTouchFront");
         wobbleTouchFront.setMode(INPUT);
+
+        shooterWheel = hardwareMap.get(DcMotor.class, "shooterWheel");
+        shooterWheel.setDirection(FORWARD);
+        shooterWheel.setZeroPowerBehavior(FLOAT);
+        shooterWheel.setMode(STOP_AND_RESET_ENCODER);
+        shooterWheel.setMode(RUN_USING_ENCODER);
+
+        shooterFlipper = hardwareMap.get(Servo.class,"shooterFlipper");
 
         try {
             webcamName = hardwareMap.get(WebcamName.class,"Webcam 1");
@@ -360,6 +372,27 @@ public class Robot {
     public void wobbleRingLatch(WobbleRingLatchPosition position) {
         wobbleRingLatch.setPosition(position.value);
     }
+
+    public enum ShooterMode {
+        ON, OFF, SHOOT
+    }
+
+    public void shooter (ShooterMode mode){
+        switch(mode){
+            case ON:
+                shooterWheel.setPower(1);
+                break;
+            case OFF:
+                shooterWheel.setPower(0);
+                shooterFlipper.setPosition(0.5);
+                break;
+            case SHOOT:
+                shooterFlipper.setPosition(1);
+                opMode.sleep(500);
+                break;
+        }
+    }
+
     public void addTelemetry() {
         Telemetry telemetry = opMode.telemetry;
 
