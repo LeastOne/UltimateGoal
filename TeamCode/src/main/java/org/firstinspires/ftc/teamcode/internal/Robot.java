@@ -360,7 +360,7 @@ public class Robot {
     }
 
     public enum WobbleRingLatchPosition {
-        OPEN(.75), CLOSED(0);
+        OPEN(1), CLOSED(0);
 
         public double value;
 
