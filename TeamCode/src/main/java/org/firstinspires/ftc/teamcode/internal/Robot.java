@@ -244,8 +244,8 @@ public class Robot {
 
         while (!opMode.isStopping() && targetPosition - position > 0) {
             remainder = getRemainderLeftToTurn(heading);
-            if (drive != 0) drive = clamp(0.2, drive, (targetPosition - position) / TICKS_PER_INCH * 12);
-            if (strafe != 0) strafe = clamp(0.2, strafe, (targetPosition - position) / TICKS_PER_INCH * 12);
+            if (drive != 0) drive = clamp(0.2, drive, (targetPosition - position) / (TICKS_PER_INCH * 12));
+            if (strafe != 0) strafe = clamp(0.2, strafe, (targetPosition - position) / (TICKS_PER_INCH * 12));
             turn = remainder / 45;
             drive(drive, strafe, turn);
 
