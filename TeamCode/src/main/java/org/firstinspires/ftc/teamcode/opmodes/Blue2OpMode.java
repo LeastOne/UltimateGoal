@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public class Blue2OpMode extends BlueOpMode {
     @Override
     protected void execute() {
-        robot.drivePower = 0.8;
+        robot.drivePower = 1.0;
 
         robot.drive(1,0,0,37);
 
