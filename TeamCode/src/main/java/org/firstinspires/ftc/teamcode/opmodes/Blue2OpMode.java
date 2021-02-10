@@ -27,7 +27,7 @@ public class Blue2OpMode extends BlueOpMode {
             default: this.targetA(); break;
         }
 
-        shootPowerShots();
+        //shootPowerShots();
     }
 
     private void shootPowerShots() {
