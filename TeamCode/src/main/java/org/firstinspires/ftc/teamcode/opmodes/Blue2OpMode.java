@@ -27,12 +27,11 @@ public class Blue2OpMode extends BlueOpMode {
             default: this.targetA(); break;
         }
 
-        shootPowerShots();
+        //shootPowerShots();
     }
 
     private void shootPowerShots() {
         robot.shooter(ON);
-        robot.drive(-1,0,22,44); //robot backs up a little bit more to move it behind the line
         robot.drive(1,0,10,0); //robot turns to (guessed) orientation to shoot power shot target
         robot.shooter(SHOOT);
         robot.drive(1,0,15,0);
@@ -66,6 +65,7 @@ public class Blue2OpMode extends BlueOpMode {
     }
 
     protected void targetC() {
+        robot.drive(-1,0,22,44); //robot backs up a little bit more to move it behind the line
         robot.drive(1,0,0,73);
         robot.drive(-1,0,0,111);
         robot.drive(0,1,0,34);
