@@ -65,11 +65,11 @@ public class Blue2OpMode extends BlueOpMode {
     private void shootPowerShots() {
         robot.shooter(ON);
         sleep(1000);
-        robot.drive(1,0,-5,0); //robot turns to (guessed) orientation to shoot power shot target
+        robot.drive(1,0,0,0); //robot turns to (guessed) orientation to shoot power shot target
+        robot.shooter(SHOOT);
+        robot.drive(1,0,-5,0);
         robot.shooter(SHOOT);
         robot.drive(1,0,-10,0);
-        robot.shooter(SHOOT);
-        robot.drive(1,0,-15,0);
         robot.shooter(SHOOT);
         robot.drive(1,0,0,8); //make sure to get back on line
     }
