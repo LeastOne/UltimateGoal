@@ -393,6 +393,11 @@ public class Robot {
         }
     }
 
+    public void shooter (double power, double position){
+        shooterWheel.setPower(power);
+        shooterFlipper.setPosition(position);
+    }
+
     public void addTelemetry() {
         Telemetry telemetry = opMode.telemetry;
 
