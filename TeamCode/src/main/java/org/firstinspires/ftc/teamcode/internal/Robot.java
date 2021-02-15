@@ -386,9 +386,9 @@ public class Robot {
                 shooterWheel.setPower(0);
                 break;
             case SHOOT:
-                shooterFlipper.setPosition(0.6);
+                shooterFlipper.setPosition(0.85);
                 opMode.sleep(500);
-                shooterFlipper.setPosition(0.4);
+                shooterFlipper.setPosition(1.0);
                 break;
         }
     }
