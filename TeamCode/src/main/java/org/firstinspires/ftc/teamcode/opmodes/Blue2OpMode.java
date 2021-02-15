@@ -62,7 +62,7 @@ public class Blue2OpMode extends BlueOpMode {
         robot.drive(-1,0,22,44); //robot backs up a little bit more to move it behind the line
         robot.drive(-1,0,22,42); //robot backs up a little bit more to move it behind the line
         robot.drive(-1,0,0,3); //continuing to back up at a different heading
-        robot.drive(0,1,22,12);
+        robot.drive(0,1,0,12);
     }
 
     private void shootPowerShots() {
