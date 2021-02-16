@@ -399,8 +399,8 @@ public class Robot {
 
         orientation = getOrientation();
 
-        telemetry.addData("Drive", "%.2f Pow", opMode.gamepad2.left_stick_y);
-        telemetry.addData("Turn", "%.2f Pow", opMode.gamepad2.right_stick_x);
+        telemetry.addData("Drive", "%.2f Pow", opMode.gamepad1.left_stick_y);
+        telemetry.addData("Turn", "%.2f Pow", opMode.gamepad1.right_stick_x);
         telemetry.addData("Drive (LF)", "%.2f Pow, %d Pos", driveLeftFront.getPower(), driveLeftFront.getCurrentPosition());
         telemetry.addData("Drive (LR)", "%.2f Pow, %d Pos", driveLeftRear.getPower(), driveLeftRear.getCurrentPosition());
         telemetry.addData("Drive (RF)", "%.2f Pow, %d Pos", driveRightFront.getPower(), driveRightFront.getCurrentPosition());
