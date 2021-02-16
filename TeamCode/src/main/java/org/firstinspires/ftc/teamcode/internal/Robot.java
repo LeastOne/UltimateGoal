@@ -381,6 +381,7 @@ public class Robot {
         switch(mode){
             case ON:
                 shooterWheel.setPower(1);
+                opMode.sleep(1000);
                 break;
             case OFF:
                 shooterWheel.setPower(0);
@@ -391,11 +392,6 @@ public class Robot {
                 shooterFlipper.setPosition(1.0);
                 break;
         }
-    }
-
-    public void shooter (double power, double position){
-        shooterWheel.setPower(power);
-        shooterFlipper.setPosition(position);
     }
 
     public void addTelemetry() {
