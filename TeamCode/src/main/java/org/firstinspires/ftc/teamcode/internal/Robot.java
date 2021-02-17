@@ -245,7 +245,9 @@ public class Robot {
     public void drive(double drive, double strafe, double heading, double inches) {
         if (opMode.isStopping()) return;
 
-        turn(drive + strafe, heading);
+        double power = clamp(0.2, 1.0, drive + strafe);
+
+        turn(power, heading);
 
         resetEncoders();
 
@@ -381,21 +383,17 @@ public class Robot {
         switch(mode){
             case ON:
                 shooterWheel.setPower(1);
+                opMode.sleep(1000);
                 break;
             case OFF:
                 shooterWheel.setPower(0);
                 break;
             case SHOOT:
-                shooterFlipper.setPosition(0.85);
-                opMode.sleep(1000);
                 shooterFlipper.setPosition(1.0);
+                opMode.sleep(1000);
+                shooterFlipper.setPosition(0.85);
                 break;
         }
-    }
-
-    public void shooter (double power, double position){
-        shooterWheel.setPower(power);
-        shooterFlipper.setPosition(position);
     }
 
     public void addTelemetry() {
@@ -403,8 +401,8 @@ public class Robot {
 
         orientation = getOrientation();
 
-        telemetry.addData("Drive", "%.2f Pow", opMode.gamepad2.left_stick_y);
-        telemetry.addData("Turn", "%.2f Pow", opMode.gamepad2.right_stick_x);
+        telemetry.addData("Drive", "%.2f Pow", opMode.gamepad1.left_stick_y);
+        telemetry.addData("Turn", "%.2f Pow", opMode.gamepad1.right_stick_x);
         telemetry.addData("Drive (LF)", "%.2f Pow, %d Pos", driveLeftFront.getPower(), driveLeftFront.getCurrentPosition());
         telemetry.addData("Drive (LR)", "%.2f Pow, %d Pos", driveLeftRear.getPower(), driveLeftRear.getCurrentPosition());
         telemetry.addData("Drive (RF)", "%.2f Pow, %d Pos", driveRightFront.getPower(), driveRightFront.getCurrentPosition());
