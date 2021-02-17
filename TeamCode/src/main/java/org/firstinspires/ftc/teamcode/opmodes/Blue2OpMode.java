@@ -69,6 +69,7 @@ public class Blue2OpMode extends BlueOpMode {
         robot.shooter(SHOOT);
         robot.drive(1,0,-12,0);
         robot.shooter(SHOOT);
+
         robot.drive(1,0,0,12); //make sure to get back on line
     }
 }

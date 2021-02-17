@@ -392,6 +392,7 @@ public class Robot {
                 shooterFlipper.setPosition(1.0);
                 opMode.sleep(1000);
                 shooterFlipper.setPosition(0.85);
+                opMode.sleep(1000);
                 break;
         }
     }
