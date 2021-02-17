@@ -245,7 +245,9 @@ public class Robot {
     public void drive(double drive, double strafe, double heading, double inches) {
         if (opMode.isStopping()) return;
 
-        turn(drive + strafe, heading);
+        double power = clamp(0.2, 1.0, drive + strafe);
+
+        turn(power, heading);
 
         resetEncoders();
 
