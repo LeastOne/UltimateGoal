@@ -14,7 +14,7 @@ public class Blue2OpMode extends BlueOpMode {
         robot.drive(1,0,0,37);
 
         String recognitionLabel = "";
-        for (int i = 0; i < 60; i++) {
+        for (int i = 0; i < 50; i++) {
             sleep(50);
             if (robot.recognitions != null && !robot.recognitions.isEmpty()) {
                 recognitionLabel = robot.recognitions.get(0).getLabel();
@@ -34,8 +34,8 @@ public class Blue2OpMode extends BlueOpMode {
         robot.drive(1,0,0,26);
         robot.drive(-1,0,0,60);
         robot.drive(0,1,0,36);
-        robot.drive(1,0,30,64);
-        robot.drive(-1,0,30,5);
+        robot.drive(1,0,28,64);
+        robot.drive(-1,0,28,5);
         robot.drive(0,1,30,28);
         robot.drive(-1,1,0,2);
     }
@@ -63,13 +63,12 @@ public class Blue2OpMode extends BlueOpMode {
 
     private void shootPowerShots() {
         robot.shooter(ON);
-        robot.drive(1,0,0,0); //robot turns to (guessed) orientation to shoot power shot target
+        robot.drive(1,0,-2,0); //robot turns to (guessed) orientation to shoot power shot target
         robot.shooter(SHOOT);
-        robot.drive(1,0,-6,0);
+        robot.drive(1,0,-7,0);
         robot.shooter(SHOOT);
         robot.drive(1,0,-12,0);
         robot.shooter(SHOOT);
-
         robot.drive(1,0,0,12); //make sure to get back on line
     }
 }

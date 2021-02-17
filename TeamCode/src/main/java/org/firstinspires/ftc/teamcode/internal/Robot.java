@@ -390,9 +390,9 @@ public class Robot {
                 break;
             case SHOOT:
                 shooterFlipper.setPosition(1.0);
-                opMode.sleep(1000);
+                opMode.sleep(500);
                 shooterFlipper.setPosition(0.85);
-                opMode.sleep(1000);
+                opMode.sleep(500);
                 break;
         }
     }
