@@ -390,7 +390,7 @@ public class Robot {
                 break;
             case SHOOT:
                 shooterFlipper.setPosition(1.0);
-                opMode.sleep(500);
+                opMode.sleep(500); //extend to 750-1000 if jamming
                 shooterFlipper.setPosition(0.85);
                 opMode.sleep(500);
                 break;
