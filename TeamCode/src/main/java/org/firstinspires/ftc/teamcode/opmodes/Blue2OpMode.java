@@ -54,9 +54,9 @@ public class Blue2OpMode extends BlueOpMode {
     protected void targetC() {
         robot.drive(1,0,0,73);
         robot.drive(-1,0,0,110);
-        robot.drive(0,1,0,34);
+        robot.drive(0,1,0,38);
         robot.drive(1,0,0,42);
-        robot.drive(1,0,25,67);
+        robot.drive(1,0,25,71);
         robot.drive(-1,0,22,42); //robot backs up a little bit more to move it behind the line
         robot.drive(0,1,0,10.5); //changed from 12 to 10.5 - Ian
     }
