@@ -382,7 +382,7 @@ public class Robot {
     public void shooter (ShooterMode mode){
         switch(mode){
             case ON:
-                shooterWheel.setPower(1);
+                shooterWheel.setPower(0.8);
                 opMode.sleep(1000);
                 break;
             case OFF:
