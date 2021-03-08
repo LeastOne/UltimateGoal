@@ -58,7 +58,8 @@ public class Blue2OpMode extends BlueOpMode {
         robot.drive(0,1,0,38);
         robot.drive(1,0,0,42);
         robot.drive(1,0,25,71);
-        robot.drive(-1,0,22,42); //robot backs up a little bit more to move it behind the line
+        robot.drive(-1,0,22,42);
+        robot.drive(0,-1,0,20);
         robot.drive(0,1,0,10.5); //changed from 12 to 10.5 - Ian
     }
 
