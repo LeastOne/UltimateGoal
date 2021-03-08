@@ -27,7 +27,7 @@ public class Blue2OpMode extends BlueOpMode {
             default: this.targetA(); break;
         }
 
-        this.shootPowerShots();
+        this.shootHighGoal();
     }
 
     protected void targetA() {
@@ -54,7 +54,8 @@ public class Blue2OpMode extends BlueOpMode {
         robot.drive(0,1,0,36);
         robot.drive(-1,0,0,25);
         robot.drive(0,-1,0,39);
-        robot.drive(0,1,0,30);
+        robot.drive(0,1,0,28);
+        robot.drive(1,0,0,4);
     }
 
     protected void targetC() {
@@ -74,6 +75,14 @@ public class Blue2OpMode extends BlueOpMode {
         robot.drive(1,0,-6,0);
         robot.shooter(SHOOT);
         robot.drive(1,0,-12,0);
+        robot.shooter(SHOOT);
+        robot.drive(1,0,0,12); //make sure to get back on line
+    }
+
+    private void shootHighGoal() {
+        robot.shooter(ON);
+        robot.shooter(SHOOT);
+        robot.shooter(SHOOT);
         robot.shooter(SHOOT);
         robot.drive(1,0,0,12); //make sure to get back on line
     }
