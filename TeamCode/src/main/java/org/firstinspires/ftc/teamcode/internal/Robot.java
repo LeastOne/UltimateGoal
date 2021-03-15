@@ -94,6 +94,9 @@ public class Robot {
     private DcMotor shooterWheel;
     private Servo shooterFlipper;
 
+    private DcMotor intakeWheel;
+
+
     public boolean navigationTargetVisible = false;
     public Position position = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
     public Orientation orientation = new Orientation();
@@ -183,6 +186,12 @@ public class Robot {
         shooterWheel.setZeroPowerBehavior(FLOAT);
         shooterWheel.setMode(STOP_AND_RESET_ENCODER);
         shooterWheel.setMode(RUN_USING_ENCODER);
+
+        intakeWheel = hardwareMap.get(DcMotor.class, "intakeWheel");
+        intakeWheel.setDirection(FORWARD);
+        intakeWheel.setZeroPowerBehavior(FLOAT);
+        intakeWheel.setMode(STOP_AND_RESET_ENCODER);
+        intakeWheel.setMode(RUN_USING_ENCODER);
 
         shooterFlipper = hardwareMap.get(Servo.class,"shooterFlipper");
 
@@ -468,5 +477,18 @@ public class Robot {
         return value >= 0 ?
             Math.min(max, Math.max(min, value)) :
             Math.min(-min, Math.max(-max, value));
+    }
+
+    public enum IntakeMode{
+        ON,OFF
+    }
+
+    public void intake(IntakeMode mode){
+         switch(mode) {
+             case ON:
+                 intakeWheel.setPower(1);
+             case OFF:
+                 intakeWheel.setPower(1);
+         }
     }
 }
