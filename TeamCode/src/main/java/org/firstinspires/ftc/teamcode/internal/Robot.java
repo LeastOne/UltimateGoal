@@ -77,6 +77,7 @@ public class Robot {
     private DcMotor intakeTop;
     private DcMotor intakeBottom;
     private DcMotor wobbleArm;
+    private DcMotor intakeLift;
 
     private Servo wobbleLatch;
     private Servo wobbleRingLatch;
@@ -488,7 +489,20 @@ public class Robot {
              case ON:
                  intakeWheel.setPower(1);
              case OFF:
-                 intakeWheel.setPower(1);
+                 intakeWheel.setPower(0);
          }
+    }
+
+    public enum IntakeLiftMode{
+        UP,DOWN
+    }
+
+    public void intake(IntakeLiftMode mode){
+        switch(mode) {
+            case UP:
+                intakeLift.setPower(1);
+            case DOWN:
+                intakeLift.setPower(0);
+        }
     }
 }
