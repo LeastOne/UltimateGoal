@@ -82,8 +82,8 @@ public class Robot {
     private Servo wobbleRingLatch;
     private RevBlinkinLedDriver lights;
 
-    private DigitalChannel wobbleTouchBack;
-    private DigitalChannel wobbleTouchFront;
+    private DigitalChannel wobbleLimitBack;
+    private DigitalChannel wobbleLimitFront;
 
     private VisionThread visionThread;
 
@@ -173,10 +173,10 @@ public class Robot {
         wobbleRingLatch = hardwareMap.get(Servo.class,"wobbleRingLatch");
         lights = hardwareMap.get(RevBlinkinLedDriver.class,"lights");
 
-        wobbleTouchBack = hardwareMap.get(DigitalChannel.class, "wobbleTouchBack");
-        wobbleTouchBack.setMode(INPUT);
-        wobbleTouchFront = hardwareMap.get(DigitalChannel.class, "wobbleTouchFront");
-        wobbleTouchFront.setMode(INPUT);
+        wobbleLimitBack = hardwareMap.get(DigitalChannel.class, "wobbleLimitBack");
+        wobbleLimitBack.setMode(INPUT);
+        wobbleLimitFront = hardwareMap.get(DigitalChannel.class, "wobbleLimitFront");
+        wobbleLimitFront.setMode(INPUT);
 
         shooterWheel = hardwareMap.get(DcMotor.class, "shooterWheel");
         shooterWheel.setDirection(FORWARD);
@@ -320,8 +320,8 @@ public class Robot {
     }
 
     public void wobbleArm(WobbleArmAction action) {
-        if ((action == UP && !wobbleTouchBack.getState()) ||
-            (action == DOWN && !wobbleTouchFront.getState())) {
+        if ((action == UP && !wobbleLimitBack.getState()) ||
+            (action == DOWN && !wobbleLimitFront.getState())) {
             wobbleArm.setPower(0);
         } else {
             wobbleArm.setPower(action.power);
@@ -379,8 +379,8 @@ public class Robot {
         ON, OFF, SHOOT
     }
 
-    public void shooter (ShooterMode mode){
-        switch(mode){
+    public void shooter(ShooterMode mode){
+        switch(mode) {
             case ON:
                 shooterWheel.setPower(1);
                 opMode.sleep(1000);
@@ -389,7 +389,7 @@ public class Robot {
                 shooterWheel.setPower(0);
                 break;
             case SHOOT:
-                shooterFlipper.setPosition(1.0);
+                shooterFlipper.setPosition(1);
                 opMode.sleep(500); //extend to 750-1000 if jamming
                 shooterFlipper.setPosition(0.85);
                 opMode.sleep(500);
@@ -409,8 +409,8 @@ public class Robot {
         telemetry.addData("Drive (RF)", "%.2f Pow, %d Pos", driveRightFront.getPower(), driveRightFront.getCurrentPosition());
         telemetry.addData("Drive (RR)", "%.2f Pow, %d Pos", driveRightRear.getPower(), driveRightRear.getCurrentPosition());
         telemetry.addData("Wobble Arm", "%.2f Pow, %d Pos", wobbleArm.getPower(), wobbleArm.getCurrentPosition());
-        telemetry.addData("Wobble Arm Down Limit", wobbleTouchBack.getState());
-        telemetry.addData("Wobble Arm Up Limit", wobbleTouchFront.getState());
+        telemetry.addData("Wobble Arm Down Limit", wobbleLimitBack.getState());
+        telemetry.addData("Wobble Arm Up Limit", wobbleLimitFront.getState());
         telemetry.addData("Wobble Latch Position", wobbleLatch.getPosition());
         telemetry.addData("Target Visible", navigationTargetVisible);
         telemetry.addData("Position (in)", position);
